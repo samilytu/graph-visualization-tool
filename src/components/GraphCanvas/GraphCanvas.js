@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import './GraphCanvas.css';
 
+//Samil branchı denemesi
 const GraphCanvas = () => {
     const [nodes, setNodes] = useState([]);
 

@@ -1,0 +1,8 @@
+.graph-canvas {
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    background-color: #90cfdd;
+    border: 10px solid #a11616;
+
+}

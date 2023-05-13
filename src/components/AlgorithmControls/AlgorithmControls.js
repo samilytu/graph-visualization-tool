@@ -1,5 +1,5 @@
 import React from 'react';
-
+//deneme4
 const AlgorithmControls = () => {
     return (
         <div className="algorithm-controls">

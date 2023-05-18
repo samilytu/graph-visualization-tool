@@ -2,7 +2,78 @@
     position: relative;
     width: 100%;
     height: 100vh;
-    background-color: #90cfdd;
-    border: 10px solid #a11616;
+
+
+}
+
+.node-enter {
+    opacity: 0;
+    transform: scale(0.5);
+}
+
+.node-enter-active {
+    opacity: 1;
+    transform: scale(1);
+    transition: opacity 500ms, transform 500ms;
+}
+
+.node-exit {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.node-exit-active {
+    opacity: 0;
+    transform: scale(0.5);
+    transition: opacity 500ms, transform 500ms;
+}
+
+.graph-container {
+    display: flex;
+    justify-content: center;
+    
+
+}
+
+.graph-canvas {
+    position: relative;
+    width: 80%;
+    height: 600px;
+    background-color: var(--background-color);
+    border: 1px solid black;
+    margin: 10px;
+    /* çerçeve çiz */
+    border: 10px solid var(--violet);
+    border-radius: 5px;
+    /* çerçeveyi mevcut temanın rengiyle boya */
+    background-color: var(--background-color);
+
+}
+
+/* .graph-info {
+    width: 20%;
+    padding-left: 20px;
+
+} */
+
+.graph-info {
+
+    align-self: flex-start; 
+
+    width: 20%; 
+    padding-left: 20px; 
+    display: flex; 
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    border: 3px solid var(--violet);
+    border-radius: 5px;
+
+    background-color: var(--background-color);
+
+
+
+
 
 }

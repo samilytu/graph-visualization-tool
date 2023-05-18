@@ -18,3 +18,25 @@
 .algorithm-controls {
     margin: 10px;
 }
+
+:root {
+    --violet: #7954A1;
+    --violet-hover: #9A7ABD;
+    --background-color: #F0F0F0;
+}
+
+body {
+    background-color: var(--background-color);
+}
+
+button {
+    background-color: var(--violet) !important;
+    color: white !important;
+}
+
+button:hover {
+    background-color: var(--violet-hover) !important;
+}
+
+
+

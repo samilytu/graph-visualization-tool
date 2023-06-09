@@ -1,53 +1,54 @@
 .graph-canvas {
-    position: relative;
-    width: 100%;
-    height: 100vh;
-
-
+  position: relative;
+  width: 100%;
+  height: 100vh;
 }
 
 .node-enter {
-    opacity: 0;
-    transform: scale(0.5);
+  opacity: 0;
+  transform: scale(0.5);
 }
 
 .node-enter-active {
-    opacity: 1;
-    transform: scale(1);
-    transition: opacity 500ms, transform 500ms;
+  opacity: 1;
+  transform: scale(1);
+  transition: opacity 500ms, transform 500ms;
 }
 
 .node-exit {
-    opacity: 1;
-    transform: scale(1);
+  opacity: 1;
+  transform: scale(1);
 }
 
 .node-exit-active {
-    opacity: 0;
-    transform: scale(0.5);
-    transition: opacity 500ms, transform 500ms;
+  opacity: 0;
+  transform: scale(0.5);
+  transition: opacity 500ms, transform 500ms;
 }
 
 .graph-container {
-    display: flex;
-    justify-content: center;
-    
-
+  display: flex;
+  justify-content: center;
 }
 
 .graph-canvas {
-    position: relative;
-    width: 80%;
-    height: 600px;
-    background-color: var(--background-color);
-    border: 1px solid black;
-    margin: 10px;
-    /* çerçeve çiz */
-    border: 10px solid var(--violet);
-    border-radius: 5px;
-    /* çerçeveyi mevcut temanın rengiyle boya */
-    background-color: var(--background-color);
-
+  position: relative;
+  width: 80%;
+  height: 600px;
+  background-color: var(--background-color);
+  border: 1px solid black;
+  margin: 10px;
+  /* çerçeve çiz */
+  border: 10px solid var(--violet);
+  border-radius: 5px;
+  /* çerçeveyi mevcut temanın rengiyle boya */
+  background-color: var(--background-color);
+  /* linear graident */
+  background-color: linear-gradient(
+    0deg,
+    rgba(34, 193, 195, 1) 0%,
+    rgba(253, 187, 45, 1) 89%
+  );
 }
 
 /* .graph-info {
@@ -57,23 +58,18 @@
 } */
 
 .graph-info {
+  align-self: flex-start;
+  color: aliceblue;
+  width: 20%;
+  padding-left: 20px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 
-    align-self: flex-start; 
+  border: 3px solid var(--violet);
+  border-radius: 5px;
 
-    width: 20%; 
-    padding-left: 20px; 
-    display: flex; 
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-
-    border: 3px solid var(--violet);
-    border-radius: 5px;
-
-    background-color: var(--background-color);
-
-
-
-
-
+  background-color: var(--background-color);
 }

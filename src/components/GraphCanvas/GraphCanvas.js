@@ -3,7 +3,10 @@ import "./GraphCanvas.css";
 import GraphInfo from "../GraphInfo/GraphInfo";
 import AlgorithmControls from "../AlgorithmControls/AlgorithmControls";
 import Modal from "react-modal";
+import dfs from "../../algorithms/dfs";
+// import { startNode } from "../AlgorithmControls/AlgorithmControls";
 
+// console.log("startNode3", startNode);
 // import { CSSTransition, TransitionGroup } from 'react-transition-group';
 
 const GraphCanvas = () => {
@@ -13,6 +16,7 @@ const GraphCanvas = () => {
   const [adjacencyList, setAdjacencyList] = useState([]);
   const [selectedNode, setSelectedNode] = useState(null);
   const [DFSState, setDFSState] = useState(null);
+  const [DFSStep, setDFSStep] = useState(null);
 
   const [DFSVisitedNodes, setDFSVisitedNodes] = useState([]);
   const [DFSVisitedEdges, setDFSVisitedEdges] = useState([]);
@@ -34,9 +38,12 @@ const GraphCanvas = () => {
       if (!newAdjacencyList[edge.start]) {
         newAdjacencyList[edge.start] = [];
       }
+      if (!newAdjacencyList[edge.end]) {
+        newAdjacencyList[edge.end] = [];
+      }
       newAdjacencyList[edge.start].push(edge.end);
+      newAdjacencyList[edge.end].push(edge.start); // add this line for undirected graph
     });
-    console.log(newAdjacencyList);
     setAdjacencyList(newAdjacencyList);
   }, [nodes, edges]);
 
@@ -56,11 +63,8 @@ const GraphCanvas = () => {
   }, [nodes, edges]);
 
   useEffect(() => {
+    console.log("DFSState", DFSState);
     if (DFSState) {
-      console.log(DFSState);
-      console.log(DFSState.currentEdgeIndex);
-      console.log(DFSState.visitedEdges.length);
-      console.log(DFSInterval.current);
       DFSInterval.current = setInterval(() => {
         setDFSState((prevState) => {
           if (prevState.currentEdgeIndex >= prevState.visitedEdges.length) {
@@ -70,12 +74,24 @@ const GraphCanvas = () => {
             const currentEdge =
               prevState.visitedEdges[prevState.currentEdgeIndex];
             if (currentEdge) {
-              // Check if currentEdge exists
               const newVisitedNodes = new Set(prevState.visitedNodes);
               newVisitedNodes.add(currentEdge.start);
               newVisitedNodes.add(currentEdge.end);
               setDFSVisitedNodes(Array.from(newVisitedNodes));
-              setDFSVisitedEdges((prevState) => [...prevState, currentEdge]);
+
+              setDFSVisitedEdges((prevState) => {
+                const newVisitedEdges = [...prevState];
+                if (
+                  !newVisitedEdges.some(
+                    (edge) =>
+                      edge.start === currentEdge.start &&
+                      edge.end === currentEdge.end
+                  )
+                ) {
+                  newVisitedEdges.push(currentEdge);
+                }
+                return newVisitedEdges;
+              });
 
               return {
                 ...prevState,
@@ -84,7 +100,7 @@ const GraphCanvas = () => {
             }
           }
         });
-      }, 1500);
+      }, 1000);
     }
 
     return () => {
@@ -93,7 +109,8 @@ const GraphCanvas = () => {
         DFSInterval.current = null;
       }
     };
-  }, [DFSState]);
+  }, [DFSState, DFSVisitedNodes, DFSVisitedEdges]);
+
 
   useEffect(() => {
     let BFSInterval;
@@ -145,35 +162,6 @@ const GraphCanvas = () => {
     return isClicked;
   };
 
-  // const createAdjacencyMatrix = (nodes, edges) => {
-  //   const matrix = Array(nodes.length)
-  //     .fill(null)
-  //     .map(() => Array(nodes.length).fill(0));
-
-  //   edges.forEach((edge) => {
-  //     matrix[edge.start][edge.end] = edge.weight ? edge.weight : 1;
-  //     matrix[edge.end][edge.start] = edge.weight ? edge.weight : 1;
-  //     console.log("Matrix:", matrix);
-  //     console.log("Edge:", edge);
-  //     console.log("Edge weight:", edge.weight);
-  //   });
-
-  //   setAdjacencyMatrix(matrix);
-  // };
-
-  // const drawNode = (e) => {
-  //     if (e.button === 0) {
-  //         if (e.target.className !== "graph-canvas") return;
-  //         const rect = e.target.getBoundingClientRect();
-  //         const x = e.clientX - rect.left - 20;
-  //         const y = e.clientY - rect.top - 20;
-  //         const clickedNode = nodes.find((node) => isNodeClicked(x, y, node));
-  //         if (!clickedNode) {
-  //             setNodes([...nodes, { x, y }]);
-  //         }
-  //     }
-  // };
-
   const removeNode = (indexToRemove) => {
     setNodes(nodes.filter((_, index) => index !== indexToRemove));
     setEdges(
@@ -189,61 +177,16 @@ const GraphCanvas = () => {
   };
 
   const finishDrawingEdge = (endIndex) => {
-    // console.log("Drawing edge:", drawingEdge);
     if (startIndex != null && endIndex != startIndex) {
-      // drawingEdge.endIndex = endIndex;
-      // const updatedDrawingEdge = { ...drawingEdge, endIndex: endIndex };
-      // setEdges([...edges, updatedDrawingEdge]);
-
-      // setEdges([
-      //   ...edges,
-      //   { start: drawingEdge.startIndex, end: endIndex, weight: edgeWeight },
-      // ]);
       setEndIndex(endIndex);
-      // setDrawingEdge(drawingEdge);
-      // console.log("Drawing edge:", drawingEdge);
-      // console.log("End index:", drawingEdge.endIndex);
-      // console.log("start index:", drawingEdge.startIndex);
-      // console.log("Drawing edge:", drawingEdge.startIndex);
 
       setModalOpen(true); // Open the modal when an edge is drawn
-      // console.log("Drawing edge:", drawingEdge);
-      // console.log("End index:", endIndex);
-      // console.log("start index:", drawingEdge.startIndex);
-
-      //Get the weight of the edge input in a modal using prompt
-      // const weight = prompt("Enter the weight of the edge");
-
-      // if (weight !== null) {
-      //   const newEdge = {
-      //     start: drawingEdge.startIndex,
-      //     end: endIndex,
-      //     weight: parseFloat(weight),
-      //   };
-      //   setEdges([...edges, newEdge]);
-      // }
     }
   };
 
   const handleModalClose = () => {
-    // console.log("End index:", endIndex);
-    // console.log("Drawing edge:", drawingEdge);
-    // console.log("start index:", drawingEdge?.startIndex);
-    // console.log("end index:", endIndex);
-    // console.log("edge weight:", edgeWeight);
-    // setEdges([
-    //   ...edges,
-    //   {
-    //     start: drawingEdge.startIndex,
-    //     end: endIndex,
-    //     weight: parseFloat(edgeWeight),
-    //   },
     // ]);
     if (edgeWeight !== "") {
-      // setDrawingEdge({ startIndex: startIndex, endIndex: endIndex, weight: edgeWeight });
-      // console.log("Weight:", edgeWeight);
-      // console.log("End index:", endIndex);
-      // console.log("weight:", edgeWeight);
       const newEdge = {
         start: startIndex,
         end: endIndex,
@@ -254,7 +197,6 @@ const GraphCanvas = () => {
 
       setEdgeWeight("");
 
-      // setDrawingEdge(null); // Reset the drawing edge
       setEndIndex(null); // Reset the end index
       setStartIndex(null); // Reset the start index
     }
@@ -266,10 +208,6 @@ const GraphCanvas = () => {
     // console.log("Edge weight:", event.target.value);
     setEdgeWeight(event.target.value);
     // console.log("drawingEdge:", drawingEdge);
-
-    // drawingEdge.weight = event.target.value;
-    // setDrawingEdge(drawingEdge);
-    // console.log("Edge weight33:", event.target.value);
   };
 
   const clearGraph = () => {
@@ -307,12 +245,15 @@ const GraphCanvas = () => {
   };
 
   const generateRandomGraph = () => {
+    setDFSState(null);
+    setDFSVisitedEdges([]); // Reset the visited edges array
+    setDFSVisitedNodes([]); // Reset the visited nodes array
     // Initialize arrays for nodes and edges
     const nodes = [];
     const edges = [];
 
     // Create at least 7 nodes with random x and y
-    for (let i = 0; i < 5; i++) {
+    for (let i = 0; i < 4; i++) {
       let x, y;
       // Ensure that the new node is not too close to existing nodes
       do {
@@ -326,7 +267,7 @@ const GraphCanvas = () => {
       nodes.push({ x, y });
     }
 
-    for (let i = 0; i < 7; i++) {
+    for (let i = 0; i < 5; i++) {
       let start, end;
       do {
         start = Math.floor(Math.random() * nodes.length);
@@ -375,24 +316,6 @@ const GraphCanvas = () => {
     }
   };
 
-  // const handleMouseUp = (e) => {
-  //     setSelectedNode(null);
-  // };
-
-  //bir node'a bir sol tık yapıldığı zaman o node selectedNode yapan kod
-  // const handleMouseDown = (e) => {
-  //     if (e.button !== 0) return;
-  //     const rect = e.target.getBoundingClientRect();
-  //     const x = e.clientX - rect.left - 20;
-  //     const y = e.clientY - rect.top - 20;
-  //     const clickedNodeIndex = nodes.findIndex((node) => isNodeClicked(x, y, node));
-  //     if (clickedNodeIndex !== -1) {
-  //         setSelectedNode(clickedNodeIndex);
-  //     } else if (e.target.className === "graph-canvas") {
-  //         setNodes([...nodes, { x, y }]);
-  //     }
-  // };
-
   const handleMouseMove = (e) => {
     if (selectedNode === null) return;
 
@@ -412,12 +335,6 @@ const GraphCanvas = () => {
       const clickedNodeIndex = nodes.findIndex((node) =>
         isNodeClicked(x, y, node)
       );
-      // if (clickedNodeIndex !== -1) {
-      //   setEdges([
-      //     ...edges,
-      //     { start: drawingEdge.startIndex, end: clickedNodeIndex },
-      //   ]);
-      // }
     }
   };
 
@@ -426,6 +343,8 @@ const GraphCanvas = () => {
       <AlgorithmControls
         adjacencyList={adjacencyList}
         setDFSState={setDFSState}
+        setDFSVisitedNodes={setDFSVisitedNodes}
+        setDFSVisitedEdges={setDFSVisitedEdges}
         setBFSState={setBFSState}
       />
       <div className="graph-container">
@@ -528,6 +447,7 @@ const GraphCanvas = () => {
             {edges.map((edge, index) => {
               // Ensure the start and end indices exist in the nodes array
               if (nodes[edge.start] && nodes[edge.end]) {
+                // console.log("DFSVisitedEdgesÇiz:", DFSVisitedEdges);
                 return (
                   <React.Fragment key={index}>
                     <line

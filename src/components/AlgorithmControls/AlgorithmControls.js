@@ -3,10 +3,13 @@ import React from "react";
 import dfs from "../../algorithms/dfs"; // import dfs function
 import bfs from "../../algorithms/bfs"; // import bfs function
 import kruskal from "../../algorithms/kruskal"; // import kruskal function
+// export let startNode = handleDFS(); // initialize and export startNode
 
-const AlgorithmControls = ({ adjacencyList, setDFSState, setBFSState }) => {
+const AlgorithmControls = ({ adjacencyList, setDFSState, setBFSState, setDFSVisitedEdges, setDFSVisitedNodes }) => {
   // get adjacencyList and setDFSState from props
   const handleDFS = () => {
+    setDFSVisitedEdges([]); // Reset the visited edges array
+    setDFSVisitedNodes([]); // Reset the visited nodes array
     const startNode = parseInt(prompt("Enter the start node:"));
     if (
       isNaN(startNode) ||
@@ -17,10 +20,13 @@ const AlgorithmControls = ({ adjacencyList, setDFSState, setBFSState }) => {
       return;
     }
 
-    const visitedEdges = dfs(adjacencyList, startNode);
+    const visitedEdges = dfs(adjacencyList, startNode).visitedEdges;
     console.log("visitedEdges2", visitedEdges);
-    setDFSState({ visitedEdges, currentEdgeIndex: 0 });
+    // const currentEdgeIndex = dfs(adjacencyList, startNode).startNode;
+    // console.log("currentEdgeIndex", currentEdgeIndex);
+    setDFSState({ visitedEdges, currentEdgeIndex: 0, startNode });
   };
+
 
   const handleBFS = () => {
     const startNode = parseInt(prompt("Enter the start node:"));

@@ -290,6 +290,7 @@ const GraphCanvas = () => {
   };
 
   const handleMouseDown = (e) => {
+    e.preventDefault();
     // console.log("handleMouseDown called");
     if (e.button !== 0) return;
     const rect = e.target.getBoundingClientRect();
@@ -317,6 +318,8 @@ const GraphCanvas = () => {
   };
 
   const handleMouseMove = (e) => {
+    e.preventDefault();
+
     if (selectedNode === null) return;
 
     const rect = e.target.getBoundingClientRect();
@@ -328,6 +331,8 @@ const GraphCanvas = () => {
   };
 
   const handleMouseUp = (e) => {
+    e.preventDefault();
+
     if (drawingEdge && selectedNode === null) {
       const rect = e.target.getBoundingClientRect();
       const x = e.clientX - rect.left - 20;

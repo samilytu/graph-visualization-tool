@@ -8,12 +8,14 @@ import Modal from "react-modal";
 // console.log("startNode3", startNode);
 // import { CSSTransition, TransitionGroup } from 'react-transition-group';
 
+const intervalTime = 1000;
+
 const GraphCanvas = () => {
   const [nodes, setNodes] = useState([]);
   const [edges, setEdges] = useState([]);
   const [adjacencyList, setAdjacencyList] = useState([]);
-  const [dfsStates, setDfsStates] = useState(null);
-  const [currentDfsStateIndex, setCurrentDfsStateIndex] = useState(0);
+  const [algorithmStates, setAlgorithmStates] = useState(null);
+  const [currentAlgorithmStateIndex, setCurrentAlgorithmStateIndex] = useState(0);
   const [mousePosition, setMousePosition] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
   const [edgeWeight, setEdgeWeight] = useState("");
@@ -21,11 +23,6 @@ const GraphCanvas = () => {
   const [startIndex, setStartIndex] = useState(null);
   const [selectedNodeIndex, setSelectedNodeIndex] = useState(null);
   const [adjacencyMatrix, setAdjacencyMatrix] = useState([]);
-  const [BFSState, setBFSState] = useState(null);
-  const [BFSInterval, setBFSInterval] = useState(null);
-  const [BFSVisitedNodes, setBFSVisitedNodes] = useState([]);
-  const [BFSVisitedEdges, setBFSVisitedEdges] = useState([]);
-  const [kruskalState, setKruskalState] = useState(null);
   const canvasRef = useRef();
 
   useEffect(() => {
@@ -60,13 +57,13 @@ const GraphCanvas = () => {
   }, [nodes, edges]);
 
   useEffect(() => {
-    if(!dfsStates) {
+    if (!algorithmStates) {
       return;
     }
-    setCurrentDfsStateIndex(0);
+    setCurrentAlgorithmStateIndex(0);
     const timer = setInterval(() => {
-      setCurrentDfsStateIndex((prevState) => {
-        if (prevState < dfsStates.length - 1) {
+      setCurrentAlgorithmStateIndex((prevState) => {
+        if (prevState < algorithmStates.length - 1) {
           return prevState + 1;
         } else {
           clearInterval(timer);
@@ -74,50 +71,13 @@ const GraphCanvas = () => {
         }
       })
 
-    }, 1000);
+    }, intervalTime);
 
     return () => {
-      setCurrentDfsStateIndex(0);
+      setCurrentAlgorithmStateIndex(0);
       clearInterval(timer);
     };
-  }, [dfsStates]);
-
-  useEffect(() => {
-    let BFSInterval;
-
-    if (BFSState) {
-      BFSInterval = setInterval(() => {
-        setBFSState((prevState) => {
-          if (prevState.currentEdgeIndex >= prevState.visitedEdges.length) {
-            clearInterval(BFSInterval);
-            return null;
-          } else {
-            const currentEdge = prevState.visitedEdges[prevState.currentEdgeIndex];
-            if (currentEdge) {
-              // Check if currentEdge exists
-              const newVisitedNodes = new Set(prevState.visitedNodes);
-              newVisitedNodes.add(currentEdge.start);
-              newVisitedNodes.add(currentEdge.end);
-              setBFSVisitedNodes(Array.from(newVisitedNodes));
-              setBFSVisitedEdges((prevState) => [...prevState, currentEdge]);
-
-              return {
-                ...prevState, currentEdgeIndex: prevState.currentEdgeIndex + 1,
-              };
-            }
-          }
-        });
-      }, 1500);
-      setBFSInterval(BFSInterval);
-    }
-
-    return () => {
-      if (BFSInterval) {
-        clearInterval(BFSInterval);
-        setBFSInterval(null);
-      }
-    };
-  }, [BFSState]);
+  }, [algorithmStates]);
 
   const removeNode = (indexToRemove) => {
     setNodes(nodes.filter((_, index) => index !== indexToRemove));
@@ -200,8 +160,8 @@ const GraphCanvas = () => {
     setEdges([]);
     setAdjacencyList([]);
     setAdjacencyMatrix([]);
-    setDfsStates(null);
-    setCurrentDfsStateIndex(0);
+    setAlgorithmStates(null);
+    setCurrentAlgorithmStateIndex(0);
     setSelectedNodeIndex(null);
   };
 
@@ -229,8 +189,8 @@ const GraphCanvas = () => {
   };
 
   const generateRandomGraph = () => {
-    setDfsStates(null);
-    setCurrentDfsStateIndex(0);
+    setAlgorithmStates(null);
+    setCurrentAlgorithmStateIndex(0);
     setSelectedNodeIndex(null);
     // Initialize arrays for nodes and edges
     const nodes = [];
@@ -305,9 +265,10 @@ const GraphCanvas = () => {
     <AlgorithmControls
       selectedNodeIndex={selectedNodeIndex}
       adjacencyList={adjacencyList}
-      onDfsStatesChange={setDfsStates}
-      onBFSStateChange={setBFSState}
-      onKruskalStateChange={setKruskalState}
+      adjacencyMatrix={adjacencyMatrix}
+      onDfsStatesChange={setAlgorithmStates}
+      onBfsStateChange={setAlgorithmStates}
+      onKruskalStateChange={setAlgorithmStates}
     />
     <div className="graph-container-wrapper">
       <div className="graph-container">
@@ -396,7 +357,7 @@ const GraphCanvas = () => {
               position: "absolute", left: 0, right: 0, marginLeft: "auto", marginRight: "auto", textAlign: "center",
             }}
           >
-                dfs index: {currentDfsStateIndex}
+                algorithm index: {currentAlgorithmStateIndex}
               </span>
 
           {startIndex != null && mousePosition && <svg
@@ -432,7 +393,7 @@ const GraphCanvas = () => {
                     x2={nodes[edge.end].x + 15}
                     y2={nodes[edge.end].y + 15}
                     strokeWidth="2"
-                    stroke={dfsStates?.[currentDfsStateIndex]?.edges?.some((e) => (e.start === edge.start && e.end === edge.end) || (e.start === edge.end && e.end === edge.start)) ? "green" : "black"}
+                    stroke={algorithmStates?.[currentAlgorithmStateIndex]?.edges?.some((e) => (e.start === edge.start && e.end === edge.end) || (e.start === edge.end && e.end === edge.start)) ? "green" : "black"}
                   />
                 </svg>
                 {/* If the edge has a weight, display it */}
@@ -471,7 +432,7 @@ const GraphCanvas = () => {
               lineHeight: selectedNodeIndex === index ? "35px" : "40px",
               fontSize: 20,
               userSelect: "none",
-              backgroundColor: dfsStates?.[currentDfsStateIndex]?.nodes?.includes(index) ? "green" : "black",
+              backgroundColor: algorithmStates?.[currentAlgorithmStateIndex]?.nodes?.includes(index) ? "green" : "black",
               border: index === selectedNodeIndex ? "2.5px solid white" : "none",
             }}
             onContextMenu={(e) => {

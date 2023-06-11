@@ -5,7 +5,7 @@ import bfs from "../../algorithms/bfs"; // import bfs function
 import "./AlgorithmControls.css";
 import kruskal from "../../algorithms/kruskal"; // import kruskal function
 
-const AlgorithmControls = ({ selectedNodeIndex, adjacencyList, onDfsStatesChange, onBFSStateChange, onKruskalStateChange }) => {
+const AlgorithmControls = ({ selectedNodeIndex, adjacencyList, adjacencyMatrix, onDfsStatesChange, onBfsStateChange, onKruskalStateChange }) => {
   // get adjacencyList and setDFSState from props
   const handleDfs = () => {
     if(selectedNodeIndex === null) {
@@ -13,14 +13,22 @@ const AlgorithmControls = ({ selectedNodeIndex, adjacencyList, onDfsStatesChange
       return;
     }
 
-    const dfsItems = dfs(adjacencyList, selectedNodeIndex);
-    console.log("dfsItems", dfsItems);
+    const dfsStates = dfs(adjacencyList, selectedNodeIndex);
+    console.log("dfsStates", dfsStates);
 
-    onDfsStatesChange(dfsItems);
+    onDfsStatesChange(dfsStates);
   };
 
-  const handleBFS = () => {
+  const handleBfs = () => {
+    if(selectedNodeIndex === null) {
+      alert("Please select a node first!");
+      return;
+    }
 
+    const bfsStates = bfs(adjacencyList, selectedNodeIndex);
+    console.log("bfsStates", bfsStates);
+
+    onBfsStateChange(bfsStates);
   };
 
   // const handleKruskal = () => {
@@ -34,7 +42,7 @@ const AlgorithmControls = ({ selectedNodeIndex, adjacencyList, onDfsStatesChange
       <button>Kruskal's Algorithm</button>
       <button>Prim's Algorithm</button>
       <button onClick={handleDfs}>DFS</button> {/* attach event handler here */}
-      <button onClick={handleBFS}>BFS</button> {/* attach event handler here */}
+      <button onClick={handleBfs}>BFS</button> {/* attach event handler here */}
       <button>Dijkstra's Algorithm</button>
     </div>
   );

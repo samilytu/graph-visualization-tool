@@ -1,24 +1,46 @@
 // src/algorithms/bfs.js
-export default function bfs(adjacencyList, startNode) {
-  const visitedNodes = new Set();
-  const visitedEdges = [];
-  const queue = [startNode];
+export default function bfs(graph, root) {
+  const states = [];
 
-  console.log(`BFS started at node ${startNode}`); // initial log
+  const visited = new Set();
+  const queue = [{ from: undefined, to: root}];
+  visited.add(root);
 
   while (queue.length > 0) {
-    const node = queue.shift(); // remove the first node from the queue
-    if (!visitedNodes.has(node)) {
-      visitedNodes.add(node);
-      console.log(`Visited node ${node}`); // log when a node is visited
-      for (const neighbour of adjacencyList[node]) {
-        queue.push(neighbour);
-        visitedEdges.push({ start: node, end: neighbour });
-        console.log(`Visited edge from node ${node} to node ${neighbour}`); // log when an edge is visited
+    // Dequeue a vertex from queue
+    const {from: lastNode, to: vertex} = queue.shift();
+
+    console.log("vertex", vertex, "queue", queue, "visited", visited)
+
+    const lastState = states.slice(-1)[0] ?? { nodes: [], edges: [] };
+    const newState = {
+      nodes: [...lastState.nodes, vertex],
+      edges: lastNode === undefined ? [] : [...lastState.edges, { start: lastNode, end: vertex }]
+    }
+    states.push(newState);
+
+    const neighbours = [...graph[vertex]]
+    neighbours.sort((a, b) => a - b)
+
+    // If not visited, mark it as visited, and enqueue it
+    for (const neighbour of neighbours) {
+      if (!visited.has(neighbour)) {
+        visited.add(neighbour);
+        queue.push({ from: vertex, to: neighbour});
       }
     }
   }
-  console.log("Visited nodes:", Array.from(visitedNodes)); // Logs the visited nodes at the end
-  console.log("Visited edges:", visitedEdges); // Logs the visited edges at the end
-  return visitedEdges;
+
+  return states;
 }
+//
+// const adjacencyList = [
+//   [1, 3],
+//   [0, 2],
+//   [0, 1, 4],
+//   [0],
+//   [2]
+// ]
+//
+// const states = bfs(adjacencyList, 0);
+// console.log("states", states.map(state => state.edges));

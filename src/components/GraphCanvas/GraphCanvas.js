@@ -46,6 +46,7 @@ const GraphCanvas = () => {
       edges.forEach((edge) => {
         if (newAdjacencyMatrix[edge.start] && newAdjacencyMatrix[edge.start][edge.end] !== undefined) {
           newAdjacencyMatrix[edge.start][edge.end] = edge.weight;
+          newAdjacencyMatrix[edge.end][edge.start] = edge.weight; // Yönsüz graf için ters yönde de kenarı kaydet
         }
       });
       setAdjacencyMatrix(newAdjacencyMatrix);

@@ -31,15 +31,16 @@ const AlgorithmControls = ({ selectedNodeIndex, adjacencyList, adjacencyMatrix, 
     onBfsStateChange(bfsStates);
   };
 
-  // const handleKruskal = () => {
-  //   const { mstEdges, totalWeight } = kruskal(adjacencyList, edges);
-  //   setKruskalState({ mstEdges, currentEdgeIndex: 0 });
-  //   alert(`Kruskal's MST Total Weight: ${totalWeight}`);
-  // };
+  const handleKruskal = () => {
+    const kruskalStates = kruskal(adjacencyMatrix);
+    console.log("kruskalStates", kruskalStates);
+
+    onKruskalStateChange(kruskalStates);
+  }
 
   return (
     <div className="algorithm-controls">
-      <button>Kruskal's Algorithm</button>
+      <button onClick={handleKruskal}>Kruskal's Algorithm</button>
       <button>Prim's Algorithm</button>
       <button onClick={handleDfs}>DFS</button> {/* attach event handler here */}
       <button onClick={handleBfs}>BFS</button> {/* attach event handler here */}

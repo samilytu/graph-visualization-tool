@@ -1,40 +1,78 @@
 // src/algorithms/kruskal.js
-export default function kruskal(adjacencyList, edges) {
-  const parent = new Array(adjacencyList.length).fill(null).map((_, i) => i);
-  const rank = new Array(adjacencyList.length).fill(0);
-  const mstEdges = [];
-  let totalWeight = 0;
+export default function kruskal(adjMatrix) {
+  const states = [];
 
-  function find(i) {
-    if (parent[i] !== i) {
-      parent[i] = find(parent[i]);
-    }
-    return parent[i];
-  }
+  const V = adjMatrix.length;
+  const graph = [];
 
-  function union(i, j) {
-    const iRoot = find(i);
-    const jRoot = find(j);
-    if (rank[iRoot] > rank[jRoot]) {
-      parent[jRoot] = iRoot;
-    } else if (rank[iRoot] < rank[jRoot]) {
-      parent[iRoot] = jRoot;
-    } else {
-      parent[jRoot] = iRoot;
-      rank[iRoot]++;
+  // Adjacency matrix'i ağırlıklı kenar listesine dönüştürme
+  for (let i = 0; i < V; i++) {
+    for (let j = i + 1; j < V; j++) {
+      if (adjMatrix[i][j] !== 0) {
+        graph.push([i, j, adjMatrix[i][j]]);
+      }
     }
   }
 
-  edges.sort((a, b) => a.weight - b.weight);
-
-  for (const edge of edges) {
-    const { start, end, weight } = edge;
-    if (find(start) !== find(end)) {
-      mstEdges.push(edge);
-      totalWeight += weight;
-      union(start, end);
+  const result = [];
+  let i = 0;
+  let e = 0;
+  graph.sort((a, b) => a[2] - b[2]);
+  const parent = [];
+  const rank = [];
+  for (let node = 0; node < V; node++) {
+    parent.push(node);
+    rank.push(0);
+  }
+  while (e < V - 1) {
+    const [u, v, w] = graph[i];
+    i++;
+    const x = find(parent, u);
+    const y = find(parent, v);
+    if (x !== y) {
+      e++;
+      result.push([u, v, w]);
+      applyUnion(parent, rank, x, y);
     }
   }
+  for (const [u, v, weight] of result) {
+    console.log(`${u} - ${v}: ${weight}`);
+    const lastState = states.slice(-1)[0] ?? {nodes: [], edges: []};
+    const newState = {
+      nodes: [], edges: [...lastState.edges, {start: u, end: v}]
+    }
+    states.push(newState);
+  }
 
-  return { mstEdges, totalWeight };
+  return states;
 }
+
+function find(parent, i) {
+  if (parent[i] !== i) {
+    parent[i] = find(parent, parent[i]);
+  }
+  return parent[i];
+}
+
+function applyUnion(parent, rank, x, y) {
+  const xRoot = find(parent, x);
+  const yRoot = find(parent, y);
+  if (rank[xRoot] < rank[yRoot]) {
+    parent[xRoot] = yRoot;
+  } else if (rank[xRoot] > rank[yRoot]) {
+    parent[yRoot] = xRoot;
+  } else {
+    parent[yRoot] = xRoot;
+    rank[xRoot]++;
+  }
+}
+//
+// // Örnek adjacency matrix
+// const adjMatrix = [
+//   [0, 15, 15, 7],
+//   [15, 0, 8, 3],
+//   [15, 8, 0, 0],
+//   [7, 3, 0, 0],
+// ];
+//
+// kruskal(adjMatrix);

@@ -39,11 +39,7 @@
 }
 
 .graph-container {
-  background: linear-gradient(
-          0deg,
-          rgba(165, 134, 198, 1) 0%,
-          rgba(181, 165, 196, 1) 74%
-  );
+  background: rgb(196, 170, 225);
   border: 1px solid #ccc;
   border-radius: 5px;
 }
@@ -86,4 +82,15 @@
   overflow: auto;
   max-height: 674px;
   padding: 16px;
+}
+
+table, th, td {
+  border: 1px solid white !important;
+  border-collapse: collapse !important;
+  padding: 6px !important;
+}
+
+table {
+  table-layout: fixed;
+  width: 100%;
 }

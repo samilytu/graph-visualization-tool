@@ -26,29 +26,30 @@
   transition: opacity 500ms, transform 500ms;
 }
 
-.graph-container {
+.graph-actions {
   display: flex;
-  justify-content: center;
+  justify-content: space-between;
+  align-items: center;
+  margin: 24px 32px 0 32px;
+}
+
+.graph-container-wrapper {
+    position: relative;
+  margin: 10px;
+}
+
+.graph-container {
+  background: rgb(196, 170, 225);
+  border: 1px solid #ccc;
+  border-radius: 5px;
 }
 
 .graph-canvas {
   position: relative;
-  width: 80%;
+  width: 800px;
   height: 600px;
-  background-color: var(--background-color);
-  border: 1px solid black;
-  margin: 10px;
-  /* çerçeve çiz */
-  border: 10px solid var(--violet);
-  border-radius: 5px;
-  /* çerçeveyi mevcut temanın rengiyle boya */
-  background-color: var(--background-color);
-  /* linear graident */
-  background-color: linear-gradient(
-    0deg,
-    rgba(34, 193, 195, 1) 0%,
-    rgba(253, 187, 45, 1) 89%
-  );
+  margin: 32px;
+  background: rgba(255, 255, 255, 0.1);
 }
 
 /* .graph-info {
@@ -58,18 +59,38 @@
 } */
 
 .graph-info {
+  position: absolute;
+  top: 0;
+  left: 900px;
   align-self: flex-start;
   color: aliceblue;
-  width: 20%;
-  padding-left: 20px;
-  text-align: center;
+  width: 350px;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
+}
 
+.graph-info-content {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  margin-top: 16px;
   border: 3px solid var(--violet);
   border-radius: 5px;
+  background-color: rgba(255, 255, 255, 0.1);
+  overflow: auto;
+  max-height: 674px;
+  padding: 16px;
+}
 
-  background-color: var(--background-color);
+table, th, td {
+  border: 1px solid white !important;
+  border-collapse: collapse !important;
+  padding: 6px !important;
+}
+
+table {
+  table-layout: fixed;
+  width: 100%;
 }

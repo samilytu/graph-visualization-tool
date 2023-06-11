@@ -2,50 +2,17 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  background: rgb(162, 122, 205);
-  background: linear-gradient(
-    0deg,
-    rgba(162, 122, 205, 1) 0%,
-    rgba(102, 82, 122, 1) 71%
-  );
+  background: rgb(38, 14, 63);
+  min-height: 100vh;
 }
 
 .toolbar {
   margin: 10px;
 }
 
-
-.graph-canvas {
-  width: 800px;
-  height: 600px;
-  border: 1px solid #ccc;
-  margin: 10px;
-  background: rgb(165, 134, 198);
-  background: linear-gradient(
-    0deg,
-    rgba(165, 134, 198, 1) 0%,
-    rgba(181, 165, 196, 1) 74%
-  );
-}
-
-.algorithm-controls {
-  margin: 10px;
-}
-
 :root {
   --violet: #7954a1;
   --violet-hover: #9a7abd;
-
-  --background-color: rgb(34, 193, 195);
-  --background-color: linear-gradient(
-    0deg,
-    rgba(34, 193, 195, 1) 0%,
-    rgba(253, 187, 45, 1) 89%
-  );
-}
-
-body {
-  background-color: var(--background-color);
 }
 
 button {

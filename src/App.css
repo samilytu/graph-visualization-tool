@@ -18,6 +18,7 @@
 button {
   background-color: var(--violet) !important;
   color: white !important;
+  text-align: initial !important;
 }
 
 button:hover {

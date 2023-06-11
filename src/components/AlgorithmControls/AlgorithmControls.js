@@ -74,15 +74,13 @@ const AlgorithmControls = ({
   }
 
   return (
-    <div className="algorithm-controls">
+    <>
+      <button onClick={handleDfs}>DFS</button>
+      <button onClick={handleBfs}>BFS</button>
       <button onClick={handleKruskal}>Kruskal's Algorithm</button>
       <button onClick={handlePrim}>Prim's Algorithm</button>
-      <button onClick={handleDfs}>DFS</button>
-      {/* attach event handler here */}
-      <button onClick={handleBfs}>BFS</button>
-      {/* attach event handler here */}
       <button onClick={handleDijkstra}>Dijkstra's Algorithm</button>
-    </div>
+    </>
   );
 };
 

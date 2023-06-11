@@ -1,42 +1,46 @@
 import React from "react";
-import { useState } from "react";
+import {useState} from "react";
 
-const GraphInfo = ({ nodes, edges, adjacencyList, adjacencyMatrix }) => {
+const GraphInfo = ({nodes, edges, adjacencyList, adjacencyMatrix}) => {
   const [showInfo, setShowInfo] = useState(false);
+
   function calculateDegrees(adjacencyList) {
     return adjacencyList.map((neighbors) => neighbors.length);
   }
+
   const degrees = calculateDegrees(adjacencyList);
   return (
     <div className="graph-info">
-      <button onClick={() => setShowInfo(!showInfo)}>
+      <button onClick={() => setShowInfo(!showInfo)} className="w-100">
         {showInfo ? "Hide Graph Info" : "Show Graph Info"}
       </button>
-      {showInfo && (
-        <>
-          <h2>Graph Info</h2>
-          <p>Node count: {nodes.length}</p>
+      {showInfo &&
+        <div className="graph-info-content">
+          <h3 style={{textAlign: "center"}}>Graph Info</h3>
+          <hr style={{marginTop: ".5rem", opacity: 1}}/>
+          <p style={{marginBottom: 0}}>Node count: {nodes.length}</p>
           <p>Edge count: {edges.length}</p>
-          <h3>Adjacency List:</h3>
-          <ul>
-            {adjacencyList.map((neighbors, index) => (
-              <li key={index}>
-                ({index + 1}) -&gt;{" "}
-                {neighbors.map((neighbor) => `(${neighbor + 1})`).join(" -> ")}
-              </li>
-            ))}
-          </ul>
-          <h3>Adjacency Matrix:</h3>
-          <table>
-            <thead>
+          {nodes.length > 0 && <>
+            <h4>Adjacency List:</h4>
+            <ul>
+              {adjacencyList.map((neighbors, index) => (
+                <li key={index} style={{textAlign: "initial"}}>
+                  ({index + 1}) -&gt;{" "}
+                  {neighbors.map((neighbor) => `(${neighbor + 1})`).join(" -> ")}
+                </li>
+              ))}
+            </ul>
+            <h4>Adjacency Matrix:</h4>
+            <table style={{marginBottom: "1rem"}}>
+              <thead>
               <tr>
                 <th></th>
                 {nodes.map((node, index) => (
                   <th key={`header-${index}`}>{index + 1}</th>
                 ))}
               </tr>
-            </thead>
-            <tbody>
+              </thead>
+              <tbody>
               {adjacencyMatrix.map((row, rowIndex) => (
                 <tr key={`row-${rowIndex}`}>
                   <th>{rowIndex + 1}</th>
@@ -47,18 +51,20 @@ const GraphInfo = ({ nodes, edges, adjacencyList, adjacencyMatrix }) => {
                   ))}
                 </tr>
               ))}
-            </tbody>
-          </table>
-          <h3>Degrees:</h3>
-          <ul>
-            {degrees.map((degree, index) => (
-              <li key={index}>
-                deg({index}) = {degree}
-              </li>
-            ))}
-          </ul>
-        </>
-      )}
+              </tbody>
+            </table>
+            <h4>Degrees:</h4>
+            <ul style={{marginBottom: 0}}>
+              {degrees.map((degree, index) => (
+                <li key={index} style={{textAlign: "initial"}}>
+                  deg({index}) = {degree}
+                </li>
+              ))}
+            </ul>
+          </>
+
+          }
+        </div>}
     </div>
   );
 };

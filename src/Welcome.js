@@ -6,8 +6,7 @@ const Welcome = () => {
     <div className="welcome">
       <br />
       <h2 style={{ color: "white" }}>
-          Welcome To Graph Visualization Tool
-
+          Graph Visualization Tool
       </h2>
 
     </div>

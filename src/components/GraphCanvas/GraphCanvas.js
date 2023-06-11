@@ -12,11 +12,9 @@ const GraphCanvas = () => {
   const [nodes, setNodes] = useState([]);
   const [edges, setEdges] = useState([]);
   const [adjacencyList, setAdjacencyList] = useState([]);
-  const [DFSState, setDFSState] = useState(null);
-  const [DFSStep, setDFSStep] = useState(null);
+  const [dfsStates, setDfsStates] = useState(null);
+  const [currentDfsStateIndex, setCurrentDfsStateIndex] = useState(0);
   const [mousePosition, setMousePosition] = useState(null);
-  const [DFSVisitedNodes, setDFSVisitedNodes] = useState([]);
-  const [DFSVisitedEdges, setDFSVisitedEdges] = useState([]);
   const [modalOpen, setModalOpen] = useState(false);
   const [edgeWeight, setEdgeWeight] = useState("");
   const [endIndex, setEndIndex] = useState(null);
@@ -27,7 +25,6 @@ const GraphCanvas = () => {
   const [BFSInterval, setBFSInterval] = useState(null);
   const [BFSVisitedNodes, setBFSVisitedNodes] = useState([]);
   const [BFSVisitedEdges, setBFSVisitedEdges] = useState([]);
-  const DFSInterval = useRef(null);
   const [kruskalState, setKruskalState] = useState(null);
   const canvasRef = useRef();
 
@@ -63,46 +60,27 @@ const GraphCanvas = () => {
   }, [nodes, edges]);
 
   useEffect(() => {
-    console.log("DFSState", DFSState);
-    if (DFSState) {
-      DFSInterval.current = setInterval(() => {
-        setDFSState((prevState) => {
-          if (prevState.currentEdgeIndex >= prevState.visitedEdges.length) {
-            clearInterval(DFSInterval.current);
-            return null;
-          } else {
-            const currentEdge = prevState.visitedEdges[prevState.currentEdgeIndex];
-            if (currentEdge) {
-              const newVisitedNodes = new Set(prevState.visitedNodes);
-              newVisitedNodes.add(currentEdge.start);
-              newVisitedNodes.add(currentEdge.end);
-              setDFSVisitedNodes(Array.from(newVisitedNodes));
-
-              setDFSVisitedEdges((prevState) => {
-                const newVisitedEdges = [...prevState];
-                if (!newVisitedEdges.some((edge) => edge.start === currentEdge.start && edge.end === currentEdge.end)) {
-                  newVisitedEdges.push(currentEdge);
-                }
-                return newVisitedEdges;
-              });
-
-              return {
-                ...prevState, currentEdgeIndex: prevState.currentEdgeIndex + 1,
-              };
-            }
-          }
-        });
-      }, 1000);
+    if(!dfsStates) {
+      return;
     }
+    setCurrentDfsStateIndex(0);
+    const timer = setInterval(() => {
+      setCurrentDfsStateIndex((prevState) => {
+        if (prevState < dfsStates.length - 1) {
+          return prevState + 1;
+        } else {
+          clearInterval(timer);
+          return prevState;
+        }
+      })
+
+    }, 1000);
 
     return () => {
-      if (DFSInterval.current) {
-        clearInterval(DFSInterval.current);
-        DFSInterval.current = null;
-      }
+      setCurrentDfsStateIndex(0);
+      clearInterval(timer);
     };
-  }, [DFSState, DFSVisitedNodes, DFSVisitedEdges]);
-
+  }, [dfsStates]);
 
   useEffect(() => {
     let BFSInterval;
@@ -144,6 +122,11 @@ const GraphCanvas = () => {
   const removeNode = (indexToRemove) => {
     setNodes(nodes.filter((_, index) => index !== indexToRemove));
     setEdges(edges.filter((edge) => edge.start !== indexToRemove && edge.end !== indexToRemove));
+    if (selectedNodeIndex === indexToRemove) {
+      setSelectedNodeIndex(null);
+    }
+    // remove all edges that contain the node to be removed
+    setEdges(e => e.filter(edge => edge.start !== indexToRemove && edge.end !== indexToRemove));
   };
 
   const startDrawingEdge = (startIndex) => {
@@ -154,7 +137,7 @@ const GraphCanvas = () => {
   const finishDrawingEdge = (endIndex) => {
     console.log("finishDrawingEdge", startIndex, endIndex);
     if (startIndex === null || endIndex === startIndex) {
-      if(startIndex === selectedNodeIndex) {
+      if (startIndex === selectedNodeIndex) {
         setSelectedNodeIndex(null);
       } else {
         setSelectedNodeIndex(startIndex);
@@ -217,9 +200,9 @@ const GraphCanvas = () => {
     setEdges([]);
     setAdjacencyList([]);
     setAdjacencyMatrix([]);
-    setDFSState(null);
-    setDFSVisitedNodes([]);
-    setDFSVisitedEdges([]);
+    setDfsStates(null);
+    setCurrentDfsStateIndex(0);
+    setSelectedNodeIndex(null);
   };
 
   const importGraph = (event) => {
@@ -246,9 +229,9 @@ const GraphCanvas = () => {
   };
 
   const generateRandomGraph = () => {
-    setDFSState(null);
-    setDFSVisitedEdges([]); // Reset the visited edges array
-    setDFSVisitedNodes([]); // Reset the visited nodes array
+    setDfsStates(null);
+    setCurrentDfsStateIndex(0);
+    setSelectedNodeIndex(null);
     // Initialize arrays for nodes and edges
     const nodes = [];
     const edges = [];
@@ -306,28 +289,25 @@ const GraphCanvas = () => {
   const isTooClose = (x, y) => {
     // avoid inserting node so close to each other
     // also avoid inserting node too close to edges
-    return nodes.some((node) => Math.abs(node.x - x) < 50 && Math.abs(node.y - y) < 50)
-    //   || edges.some((edge) => {
-    //   const start = nodes[edge.start];
-    //   const end = nodes[edge.end];
-    //   const x1 = start.x;
-    //   const y1 = start.y;
-    //   const x2 = end.x;
-    //   const y2 = end.y;
-    //   const distance = Math.abs(
-    //     (y2 - y1) * x - (x2 - x1) * y + x2 * y1 - y2 * x1
-    //   ) / Math.sqrt(Math.pow(y2 - y1, 2) + Math.pow(x2 - x1, 2));
-    //   return distance < 35;
-    // });
+    return nodes.some((node) => Math.abs(node.x - x) < 50 && Math.abs(node.y - y) < 50) || edges.some((edge) => {
+      const start = nodes[edge.start];
+      const end = nodes[edge.end];
+      const x1 = start.x;
+      const y1 = start.y;
+      const x2 = end.x;
+      const y2 = end.y;
+      const distance = Math.abs((y2 - y1) * x - (x2 - x1) * y + x2 * y1 - y2 * x1) / Math.sqrt(Math.pow(y2 - y1, 2) + Math.pow(x2 - x1, 2));
+      return distance < 35;
+    });
   }
 
   return (<>
     <AlgorithmControls
+      selectedNodeIndex={selectedNodeIndex}
       adjacencyList={adjacencyList}
-      setDFSState={setDFSState}
-      setDFSVisitedNodes={setDFSVisitedNodes}
-      setDFSVisitedEdges={setDFSVisitedEdges}
-      setBFSState={setBFSState}
+      onDfsStatesChange={setDfsStates}
+      onBFSStateChange={setBFSState}
+      onKruskalStateChange={setKruskalState}
     />
     <div className="graph-container-wrapper">
       <div className="graph-container">
@@ -416,7 +396,7 @@ const GraphCanvas = () => {
               position: "absolute", left: 0, right: 0, marginLeft: "auto", marginRight: "auto", textAlign: "center",
             }}
           >
-                start: {startIndex != null ? startIndex : "-"}
+                dfs index: {currentDfsStateIndex}
               </span>
 
           {startIndex != null && mousePosition && <svg
@@ -438,9 +418,9 @@ const GraphCanvas = () => {
           {edges.map((edge, index) => {
             // Ensure the start and end indices exist in the nodes array
             if (nodes[edge.start] && nodes[edge.end]) {
-              // console.log("DFSVisitedEdgesÇiz:", DFSVisitedEdges);
               return (<React.Fragment key={index}>
                 <svg
+                  key={edge.start + "-" + edge.end}
                   className="graph-svg"
                   style={{
                     position: "absolute", width: "100%", height: "100%", pointerEvents: "none",
@@ -452,7 +432,7 @@ const GraphCanvas = () => {
                     x2={nodes[edge.end].x + 15}
                     y2={nodes[edge.end].y + 15}
                     strokeWidth="2"
-                    stroke={DFSVisitedEdges.some((e) => e.start === edge.start && e.end === edge.end) ? "green" : "black"}
+                    stroke={dfsStates?.[currentDfsStateIndex]?.edges?.some((e) => (e.start === edge.start && e.end === edge.end) || (e.start === edge.end && e.end === edge.start)) ? "green" : "black"}
                   />
                 </svg>
                 {/* If the edge has a weight, display it */}
@@ -476,6 +456,7 @@ const GraphCanvas = () => {
               return null; // Return null if the indices do not exist
             }
           })}
+
           {nodes.map((node, index) => (<div
             key={index}
             style={{
@@ -490,7 +471,7 @@ const GraphCanvas = () => {
               lineHeight: selectedNodeIndex === index ? "35px" : "40px",
               fontSize: 20,
               userSelect: "none",
-              backgroundColor: DFSVisitedNodes.includes(index) ? "green" : "black",
+              backgroundColor: dfsStates?.[currentDfsStateIndex]?.nodes?.includes(index) ? "green" : "black",
               border: index === selectedNodeIndex ? "2.5px solid white" : "none",
             }}
             onContextMenu={(e) => {
@@ -507,7 +488,6 @@ const GraphCanvas = () => {
               e.stopPropagation();
               finishDrawingEdge(index);
             }}
-            onmouse
           >
             {index + 1}
           </div>))}

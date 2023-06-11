@@ -16,7 +16,7 @@ const GraphInfo = ({nodes, edges, adjacencyList, adjacencyMatrix}) => {
       </button>
       {showInfo &&
         <div className="graph-info-content">
-          <h3 style={{textAlign: "center"}}>Graph Info</h3>
+          <h2 style={{textAlign: "center"}}>Graph Info</h2>
           <hr style={{marginTop: ".5rem", opacity: 1}}/>
           <p style={{marginBottom: 0}}>Node count: {nodes.length}</p>
           <p>Edge count: {edges.length}</p>

@@ -5,10 +5,10 @@ const Welcome = () => {
   return (
     <div className="welcome">
       <br />
-      <h1 style={{ color: "white", fontSize: "40px" }}>
+      <h2 style={{ color: "white" }}>
           Welcome To Graph Visualization Tool
 
-      </h1>
+      </h2>
 
     </div>
   );

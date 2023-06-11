@@ -3,17 +3,15 @@ import "./GraphCanvas.css";
 import GraphInfo from "../GraphInfo/GraphInfo";
 import AlgorithmControls from "../AlgorithmControls/AlgorithmControls";
 import Modal from "react-modal";
-// import { startNode } from "../AlgorithmControls/AlgorithmControls";
 
-// console.log("startNode3", startNode);
-// import { CSSTransition, TransitionGroup } from 'react-transition-group';
-
-const intervalTime = 1000;
+const defaultIntervalTime = 1000;
 
 const GraphCanvas = () => {
   const [nodes, setNodes] = useState([]);
   const [edges, setEdges] = useState([]);
   const [adjacencyList, setAdjacencyList] = useState([]);
+  const [intervalRate, setIntervalRate] = useState(1);
+  const [intervalTime, setIntervalTime] = useState(defaultIntervalTime);
   const [algorithmStates, setAlgorithmStates] = useState(null);
   const [currentAlgorithmStateIndex, setCurrentAlgorithmStateIndex] = useState(0);
   const [mousePosition, setMousePosition] = useState(null);
@@ -24,6 +22,10 @@ const GraphCanvas = () => {
   const [selectedNodeIndex, setSelectedNodeIndex] = useState(null);
   const [adjacencyMatrix, setAdjacencyMatrix] = useState([]);
   const canvasRef = useRef();
+
+  useEffect(() => {
+    setIntervalTime(defaultIntervalTime / intervalRate);
+  }, [intervalRate])
 
   useEffect(() => {
     const newAdjacencyList = nodes.map(() => []);
@@ -372,7 +374,7 @@ const GraphCanvas = () => {
               y1={nodes[startIndex].y + 20}
               x2={(mousePosition.x) + 20}
               y2={(mousePosition.y) + 20}
-              strokeWidth="2"
+              strokeWidth="4"
               stroke="red"
             />
           </svg>}
@@ -393,8 +395,8 @@ const GraphCanvas = () => {
                     y1={nodes[edge.start].y + 15}
                     x2={nodes[edge.end].x + 15}
                     y2={nodes[edge.end].y + 15}
-                    strokeWidth="2"
-                    stroke={algorithmStates?.[currentAlgorithmStateIndex]?.edges?.some((e) => (e.start === edge.start && e.end === edge.end) || (e.start === edge.end && e.end === edge.start)) ? "green" : "black"}
+                    strokeWidth="4"
+                    stroke={algorithmStates?.[currentAlgorithmStateIndex]?.edges?.some((e) => (e.start === edge.start && e.end === edge.end) || (e.start === edge.end && e.end === edge.start)) ? "green" : "rgba(0, 0, 0, 0.6)"}
                   />
                 </svg>
                 {/* If the edge has a weight, display it */}
@@ -402,9 +404,14 @@ const GraphCanvas = () => {
                   style={{
                     position: "absolute",
                     cursor: "pointer",
-                    left: (nodes[edge.start].x + nodes[edge.end].x) / 2,
-                    top: (nodes[edge.start].y + nodes[edge.end].y) / 2,
+                    left: (nodes[edge.start].x + nodes[edge.end].x) / 2 + 10,
+                    top: (nodes[edge.start].y + nodes[edge.end].y) / 2 + 10,
                     transform: "translate(-50%, -50%)",
+                    background: "rgba(201, 178, 227)",
+                    padding: "3px 6px",
+                    userSelect: "none",
+                    fontWeight: "bold",
+                    zIndex: 10,
                   }}
                   onClick={(e) => {
                     e.stopPropagation();
@@ -454,6 +461,33 @@ const GraphCanvas = () => {
             {index + 1}
           </div>))}
         </div>
+
+        <label htmlFor="rate-range"
+               style={{
+                 marginLeft: "auto",
+                 marginRight: "auto",
+                 textAlign: "center",
+                 display: "flex",
+                 flexDirection: "column",
+                 alignItems: "center",
+                 justifyContent: "center",
+                 gap: "0.5rem",
+                 backgroundColor: "rgba(255, 255, 255, 0.5)",
+                 padding: "0.5rem",
+                 zIndex: 15,
+               }}
+        >
+          <input
+            id="rate-range"
+            type="range"
+            min="0.1" max="2"
+            value={intervalRate}
+            onChange={(e) => setIntervalRate(parseFloat(e.target.value))}
+            step="0.1"/>
+          <h5>
+                Animation Speed: {intervalRate}x
+          </h5>
+        </label>
 
         <Modal
           ariaHideApp={false}

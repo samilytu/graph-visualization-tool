@@ -276,6 +276,10 @@ const GraphCanvas = () => {
     });
   }
 
+  const removeEdge = (start, end) => {
+    setEdges(e => e.filter(edge => !(edge.start === start && edge.end === end) && !(edge.start === end && edge.end === start)))
+  }
+
   return (<>
     <AlgorithmControls
       selectedNodeIndex={selectedNodeIndex}
@@ -429,6 +433,11 @@ const GraphCanvas = () => {
                     e.stopPropagation();
                     openEditEdgeModal(edge.start, edge.end, edge.weight);
                   }}
+                  onContextMenu={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    removeEdge(edge.start, edge.end);
+                  }}
                 >
                   {edge.weight}
                 </div>)}
@@ -497,7 +506,7 @@ const GraphCanvas = () => {
             onChange={(e) => setIntervalRate(parseFloat(e.target.value))}
             step="0.1"/>
           <h5>
-                Animation Speed: {intervalRate}x
+            Animation Speed: {intervalRate}x
           </h5>
         </label>
 

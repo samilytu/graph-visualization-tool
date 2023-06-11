@@ -83,13 +83,25 @@ const GraphCanvas = () => {
   }, [algorithmStates]);
 
   const removeNode = (indexToRemove) => {
-    setNodes(nodes.filter((_, index) => index !== indexToRemove));
-    setEdges(edges.filter((edge) => edge.start !== indexToRemove && edge.end !== indexToRemove));
+    setNodes(n => n.filter((_, index) => index !== indexToRemove));
+    // shift all edges that contain a node with a higher index than the removed node
+    setEdges(e => {
+      return e
+        .filter((edge) => edge.start !== indexToRemove && edge.end !== indexToRemove)
+        .map(edge => {
+          let newEdge = {...edge};
+          if (newEdge.start > indexToRemove) {
+            newEdge.start = newEdge.start - 1;
+          }
+          if (newEdge.end > indexToRemove) {
+            newEdge.end = newEdge.end - 1;
+          }
+          return newEdge;
+        });
+    });
     if (selectedNodeIndex === indexToRemove) {
       setSelectedNodeIndex(null);
     }
-    // remove all edges that contain the node to be removed
-    setEdges(e => e.filter(edge => edge.start !== indexToRemove && edge.end !== indexToRemove));
   };
 
   const startDrawingEdge = (startIndex) => {

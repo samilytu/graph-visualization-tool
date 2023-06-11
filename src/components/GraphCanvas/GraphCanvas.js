@@ -320,16 +320,18 @@ const GraphCanvas = () => {
   };
 
   return (
-    <>
-      <AlgorithmControls
-        selectedNodeIndex={selectedNodeIndex}
-        adjacencyList={adjacencyList}
-        adjacencyMatrix={adjacencyMatrix}
-        onDfsStatesChange={setAlgorithmStates}
-        onBfsStateChange={setAlgorithmStates}
-        onKruskalStateChange={setAlgorithmStates}
-      />
+    <div className="graph-main-content">
       <div className="graph-container-wrapper">
+        <AlgorithmControls
+          selectedNodeIndex={selectedNodeIndex}
+          adjacencyList={adjacencyList}
+          adjacencyMatrix={adjacencyMatrix}
+          onDfsStatesChange={setAlgorithmStates}
+          onBfsStatesChange={setAlgorithmStates}
+          onKruskalStatesChange={setAlgorithmStates}
+          onPrimStatesChange={setAlgorithmStates}
+          onDijkstraStatesChange={setAlgorithmStates}
+        />
         <div className="graph-container">
           <div className="graph-actions">
             <button
@@ -481,7 +483,7 @@ const GraphCanvas = () => {
                         stroke={
                           algorithmStates?.[
                             currentAlgorithmStateIndex
-                          ]?.edges?.some(
+                            ]?.edges?.some(
                             (e) =>
                               (e.start === edge.start && e.end === edge.end) ||
                               (e.start === edge.end && e.end === edge.start)
@@ -545,7 +547,7 @@ const GraphCanvas = () => {
                   userSelect: "none",
                   backgroundColor: algorithmStates?.[
                     currentAlgorithmStateIndex
-                  ]?.nodes?.includes(index)
+                    ]?.nodes?.includes(index)
                     ? "green"
                     : "black",
                   border:
@@ -561,8 +563,8 @@ const GraphCanvas = () => {
                   startDrawingEdge(index);
                 }}
                 onMouseUp={(e) => {
-                  e.preventDefault(); 
-                  e.stopPropagation(); 
+                  e.preventDefault();
+                  e.stopPropagation();
                   finishDrawingEdge(index);
                 }}
               >
@@ -648,14 +650,15 @@ const GraphCanvas = () => {
             </form>
           </Modal>
         </div>
-        <GraphInfo
-          nodes={nodes}
-          edges={edges}
-          adjacencyList={adjacencyList}
-          adjacencyMatrix={adjacencyMatrix}
-        />
       </div>
-    </>
+      <GraphInfo
+        nodes={nodes}
+        edges={edges}
+        adjacencyList={adjacencyList}
+        adjacencyMatrix={adjacencyMatrix}
+      />
+
+    </div>
   );
 };
 

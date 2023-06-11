@@ -33,8 +33,14 @@
   margin: 24px 32px 0 32px;
 }
 
+.graph-main-content {
+  display: flex;
+  flex-direction: row;
+  gap: 32px;
+}
+
 .graph-container-wrapper {
-    position: relative;
+  position: relative;
   margin: 10px;
 }
 
@@ -59,9 +65,6 @@
 } */
 
 .graph-info {
-  position: absolute;
-  top: 0;
-  left: 900px;
   align-self: flex-start;
   color: aliceblue;
   width: 350px;
@@ -69,6 +72,7 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  margin-top: 56px;
 }
 
 .graph-info-content {
@@ -80,7 +84,7 @@
   border-radius: 5px;
   background-color: rgba(255, 255, 255, 0.1);
   overflow: auto;
-  max-height: 674px;
+  max-height: 750px;
   padding: 16px;
 }
 
@@ -90,7 +94,7 @@ table, th, td {
   padding: 6px !important;
 }
 
-table {
-  table-layout: fixed;
-  width: 100%;
-}
+/*table {*/
+/*  table-layout: fixed;*/
+/*  width: 100%;*/
+/*}*/

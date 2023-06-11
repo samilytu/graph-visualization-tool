@@ -66,13 +66,3 @@ function applyUnion(parent, rank, x, y) {
     rank[xRoot]++;
   }
 }
-//
-// // Örnek adjacency matrix
-// const adjMatrix = [
-//   [0, 15, 15, 7],
-//   [15, 0, 8, 3],
-//   [15, 8, 0, 0],
-//   [7, 3, 0, 0],
-// ];
-//
-// kruskal(adjMatrix);

@@ -639,6 +639,8 @@ const GraphCanvas = () => {
                 }
                 <div
                   style={{
+                    boxShadow: draggingNodeIndex === index ? "rgba(255, 255, 255, 0.8) 0px 0px 9px 3px" : "none",
+                    transition: "box-shadow 0.2s ease-in-out",
                     position: "absolute",
                     left: node.x,
                     top: node.y, // cursor: "pointer",

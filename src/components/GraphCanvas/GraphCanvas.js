@@ -24,6 +24,7 @@ const GraphCanvas = () => {
   const [selectedNodeIndex, setSelectedNodeIndex] = useState(null);
   const [adjacencyMatrix, setAdjacencyMatrix] = useState([]);
   const [showInfo, setShowInfo] = useState(false);
+  const [draggingNodeIndex, setDraggingNodeIndex] = useState(null);
   const canvasRef = useRef();
 
   useEffect(() => {
@@ -86,6 +87,20 @@ const GraphCanvas = () => {
       clearInterval(timer);
     };
   }, [algorithmStates]);
+
+  useEffect(() => {
+    if (draggingNodeIndex === null || mousePosition === null) {
+      return;
+    }
+    // if mousePosition is outside of canvas, don't update node position
+    const canvasRect = canvasRef.current.getBoundingClientRect();
+    const newNode = {
+      ...nodes[draggingNodeIndex],
+      ...((mousePosition.x >= 0 && mousePosition.x <= canvasRect.width - 40) && {x: mousePosition.x}),
+      ...((mousePosition.y >= 0 && mousePosition.y <= canvasRect.height - 40) && {y: mousePosition.y}),
+    };
+    setNodes((n) => [...n.slice(0, draggingNodeIndex), newNode, ...n.slice(draggingNodeIndex + 1),]);
+  }, [draggingNodeIndex, mousePosition]);
 
   const removeNode = (indexToRemove) => {
     setNodes((n) => n.filter((_, index) => index !== indexToRemove));
@@ -280,9 +295,8 @@ const GraphCanvas = () => {
     // console.log("handleMouseDown called");
     if (e.button !== 0) return;
 
-    const rect = canvasRef.current.getBoundingClientRect();
-    const x = e.clientX - rect.left - 20;
-    const y = e.clientY - rect.top - 20;
+    const x = mousePosition.x;
+    const y = mousePosition.y;
 
     // avoid inserting node so close to each other
     if (isTooClose(x, y)) return;
@@ -323,6 +337,14 @@ const GraphCanvas = () => {
       )
     );
   };
+
+  function startDraggingNode(index) {
+    setDraggingNodeIndex(index);
+  }
+
+  function finishDraggingNode() {
+    setDraggingNodeIndex(null);
+  }
 
   return (
     <div className="graph-main-content">
@@ -409,24 +431,17 @@ const GraphCanvas = () => {
           onMouseUp={handleMouseUp}
           onMouseMove={(e) => {
             setMousePosition({
-              x:
-                e.clientX -
-                canvasRef.current.getBoundingClientRect().left -
-                20,
-              y:
-                e.clientY -
-                canvasRef.current.getBoundingClientRect().top -
-                20,
+              x: e.clientX - canvasRef.current.getBoundingClientRect().left - 20,
+              y: e.clientY - canvasRef.current.getBoundingClientRect().top - 20,
             });
           }}
           onMouseLeave={() => {
             setMousePosition(null);
           }}
           style={{
-            cursor:
-              !mousePosition || isTooClose(mousePosition.x, mousePosition.y)
-                ? "default"
-                : "pointer",
+            cursor: !mousePosition || isTooClose(mousePosition.x, mousePosition.y)
+              ? "default"
+              : "pointer",
           }}
         >
           {/*<span*/}
@@ -590,12 +605,21 @@ const GraphCanvas = () => {
                   onMouseDown={(e) => {
                     e.preventDefault();
                     e.stopPropagation();
-                    startDrawingEdge(index);
+                    if (e.ctrlKey) {
+                      // If ctrl is pressed, start dragging the node
+                      startDraggingNode(index);
+                    } else {
+                      startDrawingEdge(index);
+                    }
                   }}
                   onMouseUp={(e) => {
                     e.preventDefault();
                     e.stopPropagation();
-                    finishDrawingEdge(index);
+                    if (draggingNodeIndex != null) {
+                      finishDraggingNode();
+                    } else {
+                      finishDrawingEdge(index);
+                    }
                   }}
                 >
                   {index + 1}

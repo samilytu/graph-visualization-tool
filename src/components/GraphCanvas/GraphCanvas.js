@@ -211,7 +211,6 @@ const GraphCanvas = () => {
     setAdjacencyMatrix([]);
     setAlgorithm(null)
     setAlgorithmStates(null);
-    setCurrentAlgorithmStateIndex(0);
     setSelectedNodeIndex(null);
   };
 
@@ -241,7 +240,6 @@ const GraphCanvas = () => {
   const generateRandomGraph = () => {
     setAlgorithm(null)
     setAlgorithmStates(null);
-    setCurrentAlgorithmStateIndex(0);
     setSelectedNodeIndex(null);
     // Initialize arrays for nodes and edges
     const nodes = [];
@@ -350,6 +348,11 @@ const GraphCanvas = () => {
     setDraggingNodeIndex(null);
   }
 
+  function clearAlgorithm() {
+    setAlgorithm(null)
+    setAlgorithmStates(null);
+  }
+
   return (
     <div className="graph-main-content">
       <div className="graph-container">
@@ -435,6 +438,7 @@ const GraphCanvas = () => {
                 setAlgorithmStates(states);
                 setAlgorithm("Dijkstra");
               }}
+              onClearAlgorithm={clearAlgorithm}
             />
           </Dropdown>
 

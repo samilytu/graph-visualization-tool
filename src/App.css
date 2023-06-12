@@ -21,6 +21,10 @@ button {
   text-align: initial !important;
 }
 
+button.danger-button {
+  background-color: #ff0000 !important;
+}
+
 button:hover {
   background-color: var(--violet-hover) !important;
 }

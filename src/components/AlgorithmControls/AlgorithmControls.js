@@ -15,7 +15,8 @@ const AlgorithmControls = ({
                              onBfsStatesChange,
                              onKruskalStatesChange,
                              onPrimStatesChange,
-                             onDijkstraStatesChange
+                             onDijkstraStatesChange,
+                             onClearAlgorithm
                            }) => {
   // get adjacencyList and setDFSState from props
   const handleDfs = () => {
@@ -80,6 +81,11 @@ const AlgorithmControls = ({
       <button onClick={handleKruskal}>Kruskal's Algorithm</button>
       <button onClick={handlePrim}>Prim's Algorithm</button>
       <button onClick={handleDijkstra}>Dijkstra's Algorithm</button>
+      <button
+        onClick={onClearAlgorithm}
+        className="danger-button"
+      >Clear
+      </button>
     </>
   );
 };

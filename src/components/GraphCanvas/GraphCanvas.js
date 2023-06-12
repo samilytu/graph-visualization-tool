@@ -353,6 +353,10 @@ const GraphCanvas = () => {
     setAlgorithmStates(null);
   }
 
+  function restartAnimation() {
+    setAlgorithmStates(s => [...s])
+  }
+
   return (
     <div className="graph-main-content">
       <div className="graph-container">
@@ -676,33 +680,72 @@ const GraphCanvas = () => {
           })}
         </div>
 
-        <label
-          htmlFor="rate-range"
-          style={{
-            marginLeft: "auto",
-            marginRight: "auto",
-            textAlign: "center",
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            justifyContent: "center",
-            gap: "0.5rem",
-            backgroundColor: "rgba(255, 255, 255, 0.5)",
-            padding: "0.5rem",
-            zIndex: 15,
-          }}
-        >
-          <input
-            id="rate-range"
-            type="range"
-            min="0.1"
-            max="2"
-            value={intervalRate}
-            onChange={(e) => setIntervalRate(parseFloat(e.target.value))}
-            step="0.1"
-          />
-          <h5>Animation Speed: {intervalRate}x</h5>
-        </label>
+        <div style={{
+          height: 80,
+          marginLeft: "auto",
+          marginRight: "auto",
+          position: "relative",
+          zIndex: 15,
+          backgroundColor: "rgba(255, 255, 255, 0.5)",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}>
+          {
+            algorithm ? (
+                <>
+                  {/*spacer*/}
+                  <div style={{
+                    flex: "1 1 0px"
+                  }}></div>
+                  <label
+                    htmlFor="rate-range"
+                    style={{
+                      textAlign: "center",
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      gap: "0.5rem",
+                      flex: "1 1 0px"
+                    }}
+                  >
+                    <input
+                      id="rate-range"
+                      type="range"
+                      min="0.1"
+                      max="2"
+                      value={intervalRate}
+                      onChange={(e) => setIntervalRate(parseFloat(e.target.value))}
+                      step="0.1"
+                    />
+                    <h5>Animation Speed: {intervalRate}x</h5>
+                  </label>
+                  <div style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    flex: "1 1 0px"
+                  }}>
+                    <button
+                      onClick={restartAnimation}
+                      disabled={currentAlgorithmStateIndex < algorithmStates.length - 1}
+                    >
+                    <span style={{
+                      display: "inline-block",
+                      transform: "rotate(45deg)",
+                      marginRight: "0.5rem",
+                    }}>&#8635;</span>
+                      Restart
+                    </button>
+                  </div>
+                </>
+              )
+              : (
+                <h5 style={{margin: 0}}>No algorithm is running</h5>
+              )
+          }
+        </div>
 
         <Modal
           ariaHideApp={false}

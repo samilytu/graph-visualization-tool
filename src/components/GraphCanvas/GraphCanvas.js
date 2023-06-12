@@ -317,9 +317,23 @@ const GraphCanvas = () => {
         const y1 = start.y;
         const x2 = end.x;
         const y2 = end.y;
-        const distance =
-          Math.abs((y2 - y1) * x - (x2 - x1) * y + x2 * y1 - y2 * x1) /
-          Math.sqrt(Math.pow(y2 - y1, 2) + Math.pow(x2 - x1, 2));
+
+        // Calculate the squared length of the edge
+        const lengthSquared = Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2);
+
+        // Calculate the dot product of the vector from (x1, y1) to (x, y) with the vector from (x1, y1) to (x2, y2)
+        const dotProduct = ((x - x1) * (x2 - x1)) + ((y - y1) * (y2 - y1));
+
+        // Calculate the normalized parameter value of the closest point on the line segment
+        const t = Math.max(0, Math.min(1, dotProduct / lengthSquared));
+
+        // Calculate the coordinates of the closest point on the line segment
+        const closestX = x1 + (t * (x2 - x1));
+        const closestY = y1 + (t * (y2 - y1));
+
+        // Calculate the distance between the given point and the closest point on the line segment
+        const distance = Math.sqrt(Math.pow(closestX - x, 2) + Math.pow(closestY - y, 2));
+
         return distance < 35;
       })
     );

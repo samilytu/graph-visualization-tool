@@ -13,9 +13,9 @@ const GraphCanvas = () => {
   const [adjacencyList, setAdjacencyList] = useState([]);
   const [intervalRate, setIntervalRate] = useState(1);
   const [intervalTime, setIntervalTime] = useState(defaultIntervalTime);
+  const [algorithm, setAlgorithm] = useState(null);
   const [algorithmStates, setAlgorithmStates] = useState(null);
-  const [currentAlgorithmStateIndex, setCurrentAlgorithmStateIndex] =
-    useState(0);
+  const [currentAlgorithmStateIndex, setCurrentAlgorithmStateIndex] = useState(0);
   const [mousePosition, setMousePosition] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
   const [edgeWeight, setEdgeWeight] = useState("");
@@ -209,6 +209,7 @@ const GraphCanvas = () => {
     setEdges([]);
     setAdjacencyList([]);
     setAdjacencyMatrix([]);
+    setAlgorithm(null)
     setAlgorithmStates(null);
     setCurrentAlgorithmStateIndex(0);
     setSelectedNodeIndex(null);
@@ -238,6 +239,7 @@ const GraphCanvas = () => {
   };
 
   const generateRandomGraph = () => {
+    setAlgorithm(null)
     setAlgorithmStates(null);
     setCurrentAlgorithmStateIndex(0);
     setSelectedNodeIndex(null);
@@ -413,11 +415,26 @@ const GraphCanvas = () => {
               selectedNodeIndex={selectedNodeIndex}
               adjacencyList={adjacencyList}
               adjacencyMatrix={adjacencyMatrix}
-              onDfsStatesChange={setAlgorithmStates}
-              onBfsStatesChange={setAlgorithmStates}
-              onKruskalStatesChange={setAlgorithmStates}
-              onPrimStatesChange={setAlgorithmStates}
-              onDijkstraStatesChange={setAlgorithmStates}
+              onDfsStatesChange={(states) => {
+                setAlgorithmStates(states);
+                setAlgorithm("DFS");
+              }}
+              onBfsStatesChange={(states) => {
+                setAlgorithmStates(states);
+                setAlgorithm("BFS");
+              }}
+              onKruskalStatesChange={(states) => {
+                setAlgorithmStates(states);
+                setAlgorithm("Kruskal");
+              }}
+              onPrimStatesChange={(states) => {
+                setAlgorithmStates(states);
+                setAlgorithm("Prim");
+              }}
+              onDijkstraStatesChange={(states) => {
+                setAlgorithmStates(states);
+                setAlgorithm("Dijkstra");
+              }}
             />
           </Dropdown>
 
@@ -446,6 +463,30 @@ const GraphCanvas = () => {
               : "pointer",
           }}
         >
+          {algorithm && <span
+            style={{
+              position: "absolute",
+              left: 0,
+              right: 0,
+              top: 10,
+              marginLeft: "auto",
+              marginRight: "auto",
+              textAlign: "center",
+              fontWeight: "bold",
+              fontSize: "1.25rem",
+              background: currentAlgorithmStateIndex === algorithmStates.length - 1
+                ? "rgba(0,131,0,0.8)"
+                : "rgba(154,0,0,0.8)",
+              color: "white",
+              padding: "0.25rem 1.5rem",
+              borderRadius: "1rem",
+              zIndex: 10,
+              width: "fit-content",
+            }}
+          >
+            {algorithm}: {currentAlgorithmStateIndex + 1}/{algorithmStates.length}
+          </span>}
+
           {/*<span*/}
           {/*  style={{*/}
           {/*    position: "absolute",*/}

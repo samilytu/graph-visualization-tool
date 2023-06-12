@@ -286,16 +286,11 @@ const GraphCanvas = () => {
   };
 
   const handleMouseUp = (e) => {
-    e.preventDefault();
-
     if (startIndex != null) {
       setEndIndex(null);
       setStartIndex(null);
       return;
     }
-
-    // console.log("handleMouseDown called");
-    if (e.button !== 0) return;
 
     const x = mousePosition.x;
     const y = mousePosition.y;
@@ -455,7 +450,14 @@ const GraphCanvas = () => {
         <div
           ref={canvasRef}
           className="graph-canvas"
-          onMouseUp={handleMouseUp}
+          onMouseUp={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+
+            if (e.button !== 0) return; // Only handle left click
+
+            handleMouseUp(e);
+          }}
           onMouseMove={(e) => {
             setMousePosition({
               x: e.clientX - canvasRef.current.getBoundingClientRect().left - 20,
@@ -656,6 +658,9 @@ const GraphCanvas = () => {
                   onMouseDown={(e) => {
                     e.preventDefault();
                     e.stopPropagation();
+
+                    if (e.button !== 0) return; // Only allow left clicks
+                    
                     if (e.altKey) {
                       // If alt is pressed, start dragging the node
                       startDraggingNode(index);
@@ -666,6 +671,9 @@ const GraphCanvas = () => {
                   onMouseUp={(e) => {
                     e.preventDefault();
                     e.stopPropagation();
+
+                    if (e.button !== 0) return; // Only allow left clicks
+
                     if (draggingNodeIndex != null) {
                       finishDraggingNode();
                     } else {

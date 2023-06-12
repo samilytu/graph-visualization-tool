@@ -492,6 +492,8 @@ const GraphCanvas = () => {
               borderRadius: "1rem",
               zIndex: 10,
               width: "fit-content",
+              userSelect: "none",
+              cursor: "initial",
             }}
           >
             {algorithm}: {currentAlgorithmStateIndex + 1}/{algorithmStates.length}
@@ -629,6 +631,7 @@ const GraphCanvas = () => {
                       color: "white",
                       borderRadius: 6,
                       zIndex: 30,
+                      userSelect: "none",
                     }}>
                       {isFinite(algorithmStateNode.label) ? algorithmStateNode.label.toString() : "∞"}
                     </div>
@@ -653,6 +656,7 @@ const GraphCanvas = () => {
                   }}
                   onContextMenu={(e) => {
                     e.preventDefault();
+                    e.stopPropagation();
                     removeNode(index);
                   }}
                   onMouseDown={(e) => {
@@ -660,7 +664,7 @@ const GraphCanvas = () => {
                     e.stopPropagation();
 
                     if (e.button !== 0) return; // Only allow left clicks
-                    
+
                     if (e.altKey) {
                       // If alt is pressed, start dragging the node
                       startDraggingNode(index);

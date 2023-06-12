@@ -652,8 +652,8 @@ const GraphCanvas = () => {
                   onMouseDown={(e) => {
                     e.preventDefault();
                     e.stopPropagation();
-                    if (e.ctrlKey) {
-                      // If ctrl is pressed, start dragging the node
+                    if (e.altKey) {
+                      // If alt is pressed, start dragging the node
                       startDraggingNode(index);
                     } else {
                       startDrawingEdge(index);

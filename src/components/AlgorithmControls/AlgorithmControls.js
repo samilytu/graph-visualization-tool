@@ -67,7 +67,7 @@ const AlgorithmControls = ({
       return;
     }
 
-    const dijkstraStates = dijkstra(adjacencyMatrix);
+    const dijkstraStates = dijkstra(adjacencyMatrix, selectedNodeIndex);
     console.log("dijkstraStates", dijkstraStates);
 
     onDijkstraStatesChange(dijkstraStates);

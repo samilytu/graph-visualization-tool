@@ -228,8 +228,11 @@ const GraphCanvas = () => {
     const nodes = [];
     const edges = [];
 
+    const V = 7;
+    const E = 8;
+
     // Create at least 7 nodes with random x and y
-    for (let i = 0; i < 4; i++) {
+    for (let i = 0; i < V; i++) {
       let x, y;
       // Ensure that the new node is not too close to existing nodes
       do {
@@ -243,7 +246,7 @@ const GraphCanvas = () => {
       nodes.push({x, y});
     }
 
-    for (let i = 0; i < 5; i++) {
+    for (let i = 0; i < E; i++) {
       let start, end;
       do {
         start = Math.floor(Math.random() * nodes.length);
@@ -547,18 +550,19 @@ const GraphCanvas = () => {
             return (
               <div key={index}>
                 {
-                  algorithmStateNode && algorithmStateNode.label && (
+                  algorithmStateNode && (algorithmStateNode.label != undefined) && (
                     <div style={{
                       position: "absolute",
                       left: node.x,
                       top: node.y > 40 ? (node.y - 30) : (node.y + 45),
                       textAlign: "center",
                       width: 40,
-                      backgroundColor: "rgba(0,120,0,0.8)",
+                      backgroundColor: "rgba(0,84,120,0.8)",
                       color: "white",
                       borderRadius: 6,
+                      zIndex: 30,
                     }}>
-                      {algorithmStateNode.label}
+                      {isFinite(algorithmStateNode.label) ? algorithmStateNode.label.toString() : "∞"}
                     </div>
                   )
                 }

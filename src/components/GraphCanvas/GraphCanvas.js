@@ -67,10 +67,13 @@ const GraphCanvas = () => {
   }, [nodes, edges]);
 
   useEffect(() => {
+    setCurrentAlgorithmStateIndex(0);
+  }, [algorithmStates]);
+
+  useEffect(() => {
     if (!algorithmStates) {
       return;
     }
-    setCurrentAlgorithmStateIndex(0);
     const timer = setInterval(() => {
       setCurrentAlgorithmStateIndex((prevState) => {
         if (prevState < algorithmStates.length - 1) {
@@ -83,10 +86,9 @@ const GraphCanvas = () => {
     }, intervalTime);
 
     return () => {
-      setCurrentAlgorithmStateIndex(0);
       clearInterval(timer);
     };
-  }, [algorithmStates]);
+  }, [algorithmStates, intervalTime]);
 
   useEffect(() => {
     if (draggingNodeIndex === null || mousePosition === null) {

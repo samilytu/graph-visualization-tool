@@ -554,10 +554,10 @@ const GraphCanvas = () => {
                     }}
                   >
                     <line
-                      x1={nodes[edge.start].x + 15}
-                      y1={nodes[edge.start].y + 15}
-                      x2={nodes[edge.end].x + 15}
-                      y2={nodes[edge.end].y + 15}
+                      x1={nodes[edge.start].x + 20}
+                      y1={nodes[edge.start].y + 20}
+                      x2={nodes[edge.end].x + 20}
+                      y2={nodes[edge.end].y + 20}
                       strokeWidth="4"
                       stroke={
                         algorithmStates?.[currentAlgorithmStateIndex]?.edges?.some(
@@ -577,9 +577,9 @@ const GraphCanvas = () => {
                         position: "absolute",
                         cursor: "pointer",
                         left:
-                          (nodes[edge.start].x + nodes[edge.end].x) / 2 + 10,
+                          (nodes[edge.start].x + nodes[edge.end].x) / 2 + 20,
                         top:
-                          (nodes[edge.start].y + nodes[edge.end].y) / 2 + 10,
+                          (nodes[edge.start].y + nodes[edge.end].y) / 2 + 20,
                         transform: "translate(-50%, -50%)",
                         background: "rgba(201, 178, 227)",
                         padding: "3px 6px",

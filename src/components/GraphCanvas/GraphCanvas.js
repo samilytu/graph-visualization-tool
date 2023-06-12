@@ -13,9 +13,9 @@ const GraphCanvas = () => {
   const [adjacencyList, setAdjacencyList] = useState([]);
   const [intervalRate, setIntervalRate] = useState(1);
   const [intervalTime, setIntervalTime] = useState(defaultIntervalTime);
+  const [algorithm, setAlgorithm] = useState(null);
   const [algorithmStates, setAlgorithmStates] = useState(null);
-  const [currentAlgorithmStateIndex, setCurrentAlgorithmStateIndex] =
-    useState(0);
+  const [currentAlgorithmStateIndex, setCurrentAlgorithmStateIndex] = useState(0);
   const [mousePosition, setMousePosition] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
   const [edgeWeight, setEdgeWeight] = useState("");
@@ -24,6 +24,7 @@ const GraphCanvas = () => {
   const [selectedNodeIndex, setSelectedNodeIndex] = useState(null);
   const [adjacencyMatrix, setAdjacencyMatrix] = useState([]);
   const [showInfo, setShowInfo] = useState(false);
+  const [draggingNodeIndex, setDraggingNodeIndex] = useState(null);
   const canvasRef = useRef();
 
   useEffect(() => {
@@ -66,10 +67,13 @@ const GraphCanvas = () => {
   }, [nodes, edges]);
 
   useEffect(() => {
+    setCurrentAlgorithmStateIndex(0);
+  }, [algorithmStates]);
+
+  useEffect(() => {
     if (!algorithmStates) {
       return;
     }
-    setCurrentAlgorithmStateIndex(0);
     const timer = setInterval(() => {
       setCurrentAlgorithmStateIndex((prevState) => {
         if (prevState < algorithmStates.length - 1) {
@@ -82,10 +86,23 @@ const GraphCanvas = () => {
     }, intervalTime);
 
     return () => {
-      setCurrentAlgorithmStateIndex(0);
       clearInterval(timer);
     };
-  }, [algorithmStates]);
+  }, [algorithmStates, intervalTime]);
+
+  useEffect(() => {
+    if (draggingNodeIndex === null || mousePosition === null) {
+      return;
+    }
+    // if mousePosition is outside of canvas, don't update node position
+    const canvasRect = canvasRef.current.getBoundingClientRect();
+    const newNode = {
+      ...nodes[draggingNodeIndex],
+      ...((mousePosition.x >= 0 && mousePosition.x <= canvasRect.width - 40) && {x: mousePosition.x}),
+      ...((mousePosition.y >= 0 && mousePosition.y <= canvasRect.height - 40) && {y: mousePosition.y}),
+    };
+    setNodes((n) => [...n.slice(0, draggingNodeIndex), newNode, ...n.slice(draggingNodeIndex + 1),]);
+  }, [draggingNodeIndex, mousePosition]);
 
   const removeNode = (indexToRemove) => {
     setNodes((n) => n.filter((_, index) => index !== indexToRemove));
@@ -192,8 +209,8 @@ const GraphCanvas = () => {
     setEdges([]);
     setAdjacencyList([]);
     setAdjacencyMatrix([]);
+    setAlgorithm(null)
     setAlgorithmStates(null);
-    setCurrentAlgorithmStateIndex(0);
     setSelectedNodeIndex(null);
   };
 
@@ -221,8 +238,8 @@ const GraphCanvas = () => {
   };
 
   const generateRandomGraph = () => {
+    setAlgorithm(null)
     setAlgorithmStates(null);
-    setCurrentAlgorithmStateIndex(0);
     setSelectedNodeIndex(null);
     // Initialize arrays for nodes and edges
     const nodes = [];
@@ -280,9 +297,8 @@ const GraphCanvas = () => {
     // console.log("handleMouseDown called");
     if (e.button !== 0) return;
 
-    const rect = canvasRef.current.getBoundingClientRect();
-    const x = e.clientX - rect.left - 20;
-    const y = e.clientY - rect.top - 20;
+    const x = mousePosition.x;
+    const y = mousePosition.y;
 
     // avoid inserting node so close to each other
     if (isTooClose(x, y)) return;
@@ -323,6 +339,19 @@ const GraphCanvas = () => {
       )
     );
   };
+
+  function startDraggingNode(index) {
+    setDraggingNodeIndex(index);
+  }
+
+  function finishDraggingNode() {
+    setDraggingNodeIndex(null);
+  }
+
+  function clearAlgorithm() {
+    setAlgorithm(null)
+    setAlgorithmStates(null);
+  }
 
   return (
     <div className="graph-main-content">
@@ -389,11 +418,27 @@ const GraphCanvas = () => {
               selectedNodeIndex={selectedNodeIndex}
               adjacencyList={adjacencyList}
               adjacencyMatrix={adjacencyMatrix}
-              onDfsStatesChange={setAlgorithmStates}
-              onBfsStatesChange={setAlgorithmStates}
-              onKruskalStatesChange={setAlgorithmStates}
-              onPrimStatesChange={setAlgorithmStates}
-              onDijkstraStatesChange={setAlgorithmStates}
+              onDfsStatesChange={(states) => {
+                setAlgorithmStates(states);
+                setAlgorithm("DFS");
+              }}
+              onBfsStatesChange={(states) => {
+                setAlgorithmStates(states);
+                setAlgorithm("BFS");
+              }}
+              onKruskalStatesChange={(states) => {
+                setAlgorithmStates(states);
+                setAlgorithm("Kruskal");
+              }}
+              onPrimStatesChange={(states) => {
+                setAlgorithmStates(states);
+                setAlgorithm("Prim");
+              }}
+              onDijkstraStatesChange={(states) => {
+                setAlgorithmStates(states);
+                setAlgorithm("Dijkstra");
+              }}
+              onClearAlgorithm={clearAlgorithm}
             />
           </Dropdown>
 
@@ -409,26 +454,43 @@ const GraphCanvas = () => {
           onMouseUp={handleMouseUp}
           onMouseMove={(e) => {
             setMousePosition({
-              x:
-                e.clientX -
-                canvasRef.current.getBoundingClientRect().left -
-                20,
-              y:
-                e.clientY -
-                canvasRef.current.getBoundingClientRect().top -
-                20,
+              x: e.clientX - canvasRef.current.getBoundingClientRect().left - 20,
+              y: e.clientY - canvasRef.current.getBoundingClientRect().top - 20,
             });
           }}
           onMouseLeave={() => {
             setMousePosition(null);
           }}
           style={{
-            cursor:
-              !mousePosition || isTooClose(mousePosition.x, mousePosition.y)
-                ? "default"
-                : "pointer",
+            cursor: !mousePosition || isTooClose(mousePosition.x, mousePosition.y)
+              ? "default"
+              : "pointer",
           }}
         >
+          {algorithm && <span
+            style={{
+              position: "absolute",
+              left: 0,
+              right: 0,
+              top: 10,
+              marginLeft: "auto",
+              marginRight: "auto",
+              textAlign: "center",
+              fontWeight: "bold",
+              fontSize: "1.25rem",
+              background: currentAlgorithmStateIndex === algorithmStates.length - 1
+                ? "rgba(0,131,0,0.8)"
+                : "rgba(154,0,0,0.8)",
+              color: "white",
+              padding: "0.25rem 1.5rem",
+              borderRadius: "1rem",
+              zIndex: 10,
+              width: "fit-content",
+            }}
+          >
+            {algorithm}: {currentAlgorithmStateIndex + 1}/{algorithmStates.length}
+          </span>}
+
           {/*<span*/}
           {/*  style={{*/}
           {/*    position: "absolute",*/}
@@ -590,12 +652,21 @@ const GraphCanvas = () => {
                   onMouseDown={(e) => {
                     e.preventDefault();
                     e.stopPropagation();
-                    startDrawingEdge(index);
+                    if (e.ctrlKey) {
+                      // If ctrl is pressed, start dragging the node
+                      startDraggingNode(index);
+                    } else {
+                      startDrawingEdge(index);
+                    }
                   }}
                   onMouseUp={(e) => {
                     e.preventDefault();
                     e.stopPropagation();
-                    finishDrawingEdge(index);
+                    if (draggingNodeIndex != null) {
+                      finishDraggingNode();
+                    } else {
+                      finishDrawingEdge(index);
+                    }
                   }}
                 >
                   {index + 1}

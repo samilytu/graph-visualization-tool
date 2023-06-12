@@ -1,8 +1,6 @@
 import React from "react";
-import {useState} from "react";
 
-const GraphInfo = ({nodes, edges, adjacencyList, adjacencyMatrix}) => {
-  const [showInfo, setShowInfo] = useState(false);
+const GraphInfo = ({showInfo, nodes, edges, adjacencyList, adjacencyMatrix}) => {
 
   function calculateDegrees(adjacencyList) {
     return adjacencyList.map((neighbors) => neighbors.length);
@@ -10,12 +8,9 @@ const GraphInfo = ({nodes, edges, adjacencyList, adjacencyMatrix}) => {
 
   const degrees = calculateDegrees(adjacencyList);
   return (
-    <div className="graph-info">
-      <button onClick={() => setShowInfo(!showInfo)} className="w-100">
-        {showInfo ? "Hide Graph Info" : "Show Graph Info"}
-      </button>
+    <>
       {showInfo &&
-        <div className="graph-info-content">
+        <div className="graph-info">
           <h2 style={{textAlign: "center"}}>Graph Info</h2>
           <hr style={{marginTop: ".5rem", opacity: 1}}/>
           <p style={{marginBottom: 0}}>Node count: {nodes.length}</p>
@@ -62,10 +57,10 @@ const GraphInfo = ({nodes, edges, adjacencyList, adjacencyMatrix}) => {
               ))}
             </ul>
           </>
-
           }
-        </div>}
-    </div>
+        </div>
+      }
+    </>
   );
 };
 

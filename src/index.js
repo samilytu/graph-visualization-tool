@@ -4,8 +4,7 @@ import App from './App.js';
 import {createRoot} from 'react-dom/client';
 import {DevSupport} from "@react-buddy/ide-toolbox";
 import {ComponentPreviews, useInitial} from "./dev";
-// import bootstrap from 'bootstrap'
-
+import "bootstrap/dist/css/bootstrap.min.css";
 
 const container = document.getElementById('root');
 

@@ -1,6 +1,6 @@
 // src/algorithms/kruskal.js
 export default function kruskal(adjMatrix) {
-  const states = [];
+  const states = [{nodes: [], edges: []}];
 
   const V = adjMatrix.length;
   const graph = [];
@@ -37,7 +37,7 @@ export default function kruskal(adjMatrix) {
   }
   for (const [u, v, weight] of result) {
     console.log(`${u} - ${v}: ${weight}`);
-    const lastState = states.slice(-1)[0] ?? {nodes: [], edges: []};
+    const lastState = states.slice(-1)[0]
     const newState = {
       nodes: [], edges: [...lastState.edges, {start: u, end: v}]
     }
@@ -66,13 +66,3 @@ function applyUnion(parent, rank, x, y) {
     rank[xRoot]++;
   }
 }
-//
-// // Örnek adjacency matrix
-// const adjMatrix = [
-//   [0, 15, 15, 7],
-//   [15, 0, 8, 3],
-//   [15, 8, 0, 0],
-//   [7, 3, 0, 0],
-// ];
-//
-// kruskal(adjMatrix);

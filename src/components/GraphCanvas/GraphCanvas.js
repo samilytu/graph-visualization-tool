@@ -1,8 +1,9 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, {useEffect, useRef, useState} from "react";
 import "./GraphCanvas.css";
 import GraphInfo from "../GraphInfo/GraphInfo";
 import AlgorithmControls from "../AlgorithmControls/AlgorithmControls";
 import Modal from "react-modal";
+import Dropdown from "../Dropdown/Dropdown";
 
 const defaultIntervalTime = 1000;
 
@@ -22,6 +23,7 @@ const GraphCanvas = () => {
   const [startIndex, setStartIndex] = useState(null);
   const [selectedNodeIndex, setSelectedNodeIndex] = useState(null);
   const [adjacencyMatrix, setAdjacencyMatrix] = useState([]);
+  const [showInfo, setShowInfo] = useState(false);
   const canvasRef = useRef();
 
   useEffect(() => {
@@ -94,7 +96,7 @@ const GraphCanvas = () => {
           (edge) => edge.start !== indexToRemove && edge.end !== indexToRemove
         )
         .map((edge) => {
-          let newEdge = { ...edge };
+          let newEdge = {...edge};
           if (newEdge.start > indexToRemove) {
             newEdge.start = newEdge.start - 1;
           }
@@ -209,8 +211,8 @@ const GraphCanvas = () => {
   };
 
   const exportGraph = () => {
-    const data = JSON.stringify({ nodes, edges });
-    const blob = new Blob([data], { type: "application/json" });
+    const data = JSON.stringify({nodes, edges});
+    const blob = new Blob([data], {type: "application/json"});
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.download = "graph.json";
@@ -226,8 +228,11 @@ const GraphCanvas = () => {
     const nodes = [];
     const edges = [];
 
+    const V = 7;
+    const E = 8;
+
     // Create at least 7 nodes with random x and y
-    for (let i = 0; i < 4; i++) {
+    for (let i = 0; i < V; i++) {
       let x, y;
       // Ensure that the new node is not too close to existing nodes
       do {
@@ -237,11 +242,11 @@ const GraphCanvas = () => {
         nodes.some(
           (node) => Math.abs(node.x - x) < 150 && Math.abs(node.y - y) < 150
         )
-      );
-      nodes.push({ x, y });
+        );
+      nodes.push({x, y});
     }
 
-    for (let i = 0; i < 5; i++) {
+    for (let i = 0; i < E; i++) {
       let start, end;
       do {
         start = Math.floor(Math.random() * nodes.length);
@@ -253,9 +258,9 @@ const GraphCanvas = () => {
             (edge.start === start && edge.end === end) ||
             (edge.start === end && edge.end === start)
         )
-      ); // Ensure the end node is different from the start node and the edge doesn't already exist
+        ); // Ensure the end node is different from the start node and the edge doesn't already exist
       const weight = Math.floor(Math.random() * 15) + 1; // Random weight between 1 and 15
-      edges.push({ start, end, weight });
+      edges.push({start, end, weight});
     }
 
     // Set the new nodes and edges
@@ -283,7 +288,7 @@ const GraphCanvas = () => {
     if (isTooClose(x, y)) return;
 
     if (e.target.className === "graph-canvas") {
-      setNodes([...nodes, { x, y }]);
+      setNodes([...nodes, {x, y}]);
     }
   };
 
@@ -320,18 +325,10 @@ const GraphCanvas = () => {
   };
 
   return (
-    <>
-      <AlgorithmControls
-        selectedNodeIndex={selectedNodeIndex}
-        adjacencyList={adjacencyList}
-        adjacencyMatrix={adjacencyMatrix}
-        onDfsStatesChange={setAlgorithmStates}
-        onBfsStateChange={setAlgorithmStates}
-        onKruskalStateChange={setAlgorithmStates}
-      />
-      <div className="graph-container-wrapper">
-        <div className="graph-container">
-          <div className="graph-actions">
+    <div className="graph-main-content">
+      <div className="graph-container">
+        <div className="graph-actions">
+          <Dropdown text="Graph">
             <button
               style={{
                 zIndex: 10,
@@ -348,7 +345,9 @@ const GraphCanvas = () => {
             >
               Random Graph
             </button>
-            {/* Import ve Export düğmeleri */}
+          </Dropdown>
+
+          <Dropdown text="Import/Export">
             <label
               htmlFor="import-graph"
               style={{
@@ -382,280 +381,316 @@ const GraphCanvas = () => {
             >
               Save&Export Graph
             </button>
-          </div>
 
-          <div
-            ref={canvasRef}
-            className="graph-canvas"
-            onMouseUp={handleMouseUp}
-            onMouseMove={(e) => {
-              setMousePosition({
-                x:
-                  e.clientX -
-                  canvasRef.current.getBoundingClientRect().left -
-                  20,
-                y:
-                  e.clientY -
-                  canvasRef.current.getBoundingClientRect().top -
-                  20,
-              });
-            }}
-            onMouseLeave={() => {
-              setMousePosition(null);
-            }}
-            style={{
-              cursor:
-                !mousePosition || isTooClose(mousePosition.x, mousePosition.y)
-                  ? "default"
-                  : "pointer",
-            }}
-          >
-            {/*<span*/}
-            {/*  style={{*/}
-            {/*    position: "absolute",*/}
-            {/*    left: 0,*/}
-            {/*    right: 0,*/}
-            {/*    marginLeft: "auto",*/}
-            {/*    marginRight: "auto",*/}
-            {/*    textAlign: "center",*/}
-            {/*  }}*/}
-            {/*>*/}
-            {/*  {mousePosition ? "(" + mousePosition.x + ", " + mousePosition.y + ")" : "-"}*/}
-            {/*</span>*/}
+          </Dropdown>
 
-            <span
+          <Dropdown text="Algorithms">
+            <AlgorithmControls
+              selectedNodeIndex={selectedNodeIndex}
+              adjacencyList={adjacencyList}
+              adjacencyMatrix={adjacencyMatrix}
+              onDfsStatesChange={setAlgorithmStates}
+              onBfsStatesChange={setAlgorithmStates}
+              onKruskalStatesChange={setAlgorithmStates}
+              onPrimStatesChange={setAlgorithmStates}
+              onDijkstraStatesChange={setAlgorithmStates}
+            />
+          </Dropdown>
+
+          <button onClick={() => setShowInfo(!showInfo)}>
+            {showInfo ? "Hide Graph Info" : "Show Graph Info"}
+          </button>
+
+        </div>
+
+        <div
+          ref={canvasRef}
+          className="graph-canvas"
+          onMouseUp={handleMouseUp}
+          onMouseMove={(e) => {
+            setMousePosition({
+              x:
+                e.clientX -
+                canvasRef.current.getBoundingClientRect().left -
+                20,
+              y:
+                e.clientY -
+                canvasRef.current.getBoundingClientRect().top -
+                20,
+            });
+          }}
+          onMouseLeave={() => {
+            setMousePosition(null);
+          }}
+          style={{
+            cursor:
+              !mousePosition || isTooClose(mousePosition.x, mousePosition.y)
+                ? "default"
+                : "pointer",
+          }}
+        >
+          {/*<span*/}
+          {/*  style={{*/}
+          {/*    position: "absolute",*/}
+          {/*    left: 0,*/}
+          {/*    right: 0,*/}
+          {/*    marginLeft: "auto",*/}
+          {/*    marginRight: "auto",*/}
+          {/*    textAlign: "center",*/}
+          {/*  }}*/}
+          {/*>*/}
+          {/*  {mousePosition ? "(" + mousePosition.x + ", " + mousePosition.y + ")" : "-"}*/}
+          {/*</span>*/}
+
+          {/*<span*/}
+          {/*  style={{*/}
+          {/*    position: "absolute",*/}
+          {/*    left: 0,*/}
+          {/*    right: 0,*/}
+          {/*    marginLeft: "auto",*/}
+          {/*    marginRight: "auto",*/}
+          {/*    textAlign: "center",*/}
+          {/*  }}*/}
+          {/*>*/}
+          {/*    algorithm index: {currentAlgorithmStateIndex}*/}
+          {/*  </span>*/}
+
+          {startIndex != null && mousePosition && (
+            <svg
+              className="graph-svg"
               style={{
                 position: "absolute",
-                left: 0,
-                right: 0,
-                marginLeft: "auto",
-                marginRight: "auto",
-                textAlign: "center",
+                width: "100%",
+                height: "100%",
+                pointerEvents: "none",
               }}
             >
-              algorithm index: {currentAlgorithmStateIndex}
-            </span>
+              <line
+                x1={nodes[startIndex].x + 20}
+                y1={nodes[startIndex].y + 20}
+                x2={mousePosition.x + 20}
+                y2={mousePosition.y + 20}
+                strokeWidth="4"
+                stroke="red"
+              />
+            </svg>
+          )}
 
-            {startIndex != null && mousePosition && (
-              <svg
-                className="graph-svg"
-                style={{
-                  position: "absolute",
-                  width: "100%",
-                  height: "100%",
-                  pointerEvents: "none",
-                }}
-              >
-                <line
-                  x1={nodes[startIndex].x + 20}
-                  y1={nodes[startIndex].y + 20}
-                  x2={mousePosition.x + 20}
-                  y2={mousePosition.y + 20}
-                  strokeWidth="4"
-                  stroke="red"
-                />
-              </svg>
-            )}
-
-            {edges.map((edge, index) => {
-              // Ensure the start and end indices exist in the nodes array
-              if (nodes[edge.start] && nodes[edge.end]) {
-                return (
-                  <React.Fragment key={index}>
-                    <svg
-                      key={edge.start + "-" + edge.end}
-                      className="graph-svg"
+          {edges.map((edge, index) => {
+            // Ensure the start and end indices exist in the nodes array
+            if (nodes[edge.start] && nodes[edge.end]) {
+              return (
+                <React.Fragment key={index}>
+                  <svg
+                    key={edge.start + "-" + edge.end}
+                    className="graph-svg"
+                    style={{
+                      position: "absolute",
+                      width: "100%",
+                      height: "100%",
+                      pointerEvents: "none",
+                    }}
+                  >
+                    <line
+                      x1={nodes[edge.start].x + 15}
+                      y1={nodes[edge.start].y + 15}
+                      x2={nodes[edge.end].x + 15}
+                      y2={nodes[edge.end].y + 15}
+                      strokeWidth="4"
+                      stroke={
+                        algorithmStates?.[currentAlgorithmStateIndex]?.edges?.some(
+                          (e) =>
+                            (e.start === edge.start && e.end === edge.end) ||
+                            (e.start === edge.end && e.end === edge.start)
+                        )
+                          ? "green"
+                          : "rgba(0, 0, 0, 0.6)"
+                      }
+                    />
+                  </svg>
+                  {/* If the edge has a weight, display it */}
+                  {edge.weight && (
+                    <div
                       style={{
                         position: "absolute",
-                        width: "100%",
-                        height: "100%",
-                        pointerEvents: "none",
+                        cursor: "pointer",
+                        left:
+                          (nodes[edge.start].x + nodes[edge.end].x) / 2 + 10,
+                        top:
+                          (nodes[edge.start].y + nodes[edge.end].y) / 2 + 10,
+                        transform: "translate(-50%, -50%)",
+                        background: "rgba(201, 178, 227)",
+                        padding: "3px 6px",
+                        userSelect: "none",
+                        fontWeight: "bold",
+                        zIndex: 10,
+                      }}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        openEditEdgeModal(edge.start, edge.end, edge.weight);
+                      }}
+                      onContextMenu={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        removeEdge(edge.start, edge.end);
                       }}
                     >
-                      <line
-                        x1={nodes[edge.start].x + 15}
-                        y1={nodes[edge.start].y + 15}
-                        x2={nodes[edge.end].x + 15}
-                        y2={nodes[edge.end].y + 15}
-                        strokeWidth="4"
-                        stroke={
-                          algorithmStates?.[
-                            currentAlgorithmStateIndex
-                          ]?.edges?.some(
-                            (e) =>
-                              (e.start === edge.start && e.end === edge.end) ||
-                              (e.start === edge.end && e.end === edge.start)
-                          )
-                            ? "green"
-                            : "rgba(0, 0, 0, 0.6)"
-                        }
-                      />
-                    </svg>
-                    {/* If the edge has a weight, display it */}
-                    {edge.weight && (
-                      <div
-                        style={{
-                          position: "absolute",
-                          cursor: "pointer",
-                          left:
-                            (nodes[edge.start].x + nodes[edge.end].x) / 2 + 10,
-                          top:
-                            (nodes[edge.start].y + nodes[edge.end].y) / 2 + 10,
-                          transform: "translate(-50%, -50%)",
-                          background: "rgba(201, 178, 227)",
-                          padding: "3px 6px",
-                          userSelect: "none",
-                          fontWeight: "bold",
-                          zIndex: 10,
-                        }}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          openEditEdgeModal(edge.start, edge.end, edge.weight);
-                        }}
-                        onContextMenu={(e) => {
-                          e.preventDefault();
-                          e.stopPropagation();
-                          removeEdge(edge.start, edge.end);
-                        }}
-                      >
-                        {edge.weight}
-                      </div>
-                    )}
-                  </React.Fragment>
-                );
-              } else {
-                return null; // Return null if the indices do not exist
-              }
-            })}
+                      {edge.weight}
+                    </div>
+                  )}
+                </React.Fragment>
+              );
+            } else {
+              return null; // Return null if the indices do not exist
+            }
+          })}
 
-            {nodes.map((node, index) => (
-              <div
-                key={index}
-                style={{
-                  position: "absolute",
-                  left: node.x,
-                  top: node.y, // cursor: "pointer",
-                  width: 40,
-                  height: 40,
-                  borderRadius: "50%",
-                  color: "white",
-                  textAlign: "center",
-                  lineHeight: selectedNodeIndex === index ? "35px" : "40px",
-                  fontSize: 20,
-                  userSelect: "none",
-                  backgroundColor: algorithmStates?.[
-                    currentAlgorithmStateIndex
-                  ]?.nodes?.includes(index)
-                    ? "green"
-                    : "black",
-                  border:
-                    index === selectedNodeIndex ? "2.5px solid white" : "none",
-                }}
-                onContextMenu={(e) => {
-                  e.preventDefault();
-                  removeNode(index);
-                }}
-                onMouseDown={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  startDrawingEdge(index);
-                }}
-                onMouseUp={(e) => {
-                  e.preventDefault(); 
-                  e.stopPropagation(); 
-                  finishDrawingEdge(index);
-                }}
-              >
-                {index + 1}
+          {nodes.map((node, index) => {
+            const algorithmStateNode = algorithmStates?.[currentAlgorithmStateIndex]?.nodes?.[index]
+            return (
+              <div key={index}>
+                {
+                  algorithmStateNode && (algorithmStateNode.label != undefined) && (
+                    <div style={{
+                      position: "absolute",
+                      left: node.x,
+                      top: node.y > 40 ? (node.y - 30) : (node.y + 45),
+                      textAlign: "center",
+                      width: 40,
+                      backgroundColor: "rgba(0,84,120,0.8)",
+                      color: "white",
+                      borderRadius: 6,
+                      zIndex: 30,
+                    }}>
+                      {isFinite(algorithmStateNode.label) ? algorithmStateNode.label.toString() : "∞"}
+                    </div>
+                  )
+                }
+                <div
+                  style={{
+                    position: "absolute",
+                    left: node.x,
+                    top: node.y, // cursor: "pointer",
+                    width: 40,
+                    height: 40,
+                    borderRadius: "50%",
+                    color: "white",
+                    textAlign: "center",
+                    lineHeight: selectedNodeIndex === index ? "35px" : "40px",
+                    fontSize: 20,
+                    userSelect: "none",
+                    backgroundColor: algorithmStateNode?.visited ? "green" : "black",
+                    border:
+                      index === selectedNodeIndex ? "2.5px solid white" : "none",
+                  }}
+                  onContextMenu={(e) => {
+                    e.preventDefault();
+                    removeNode(index);
+                  }}
+                  onMouseDown={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    startDrawingEdge(index);
+                  }}
+                  onMouseUp={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    finishDrawingEdge(index);
+                  }}
+                >
+                  {index + 1}
+                </div>
               </div>
-            ))}
-          </div>
-
-          <label
-            htmlFor="rate-range"
-            style={{
-              marginLeft: "auto",
-              marginRight: "auto",
-              textAlign: "center",
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              justifyContent: "center",
-              gap: "0.5rem",
-              backgroundColor: "rgba(255, 255, 255, 0.5)",
-              padding: "0.5rem",
-              zIndex: 15,
-            }}
-          >
-            <input
-              id="rate-range"
-              type="range"
-              min="0.1"
-              max="2"
-              value={intervalRate}
-              onChange={(e) => setIntervalRate(parseFloat(e.target.value))}
-              step="0.1"
-            />
-            <h5>Animation Speed: {intervalRate}x</h5>
-          </label>
-
-          <Modal
-            ariaHideApp={false}
-            shouldCloseOnEsc={true}
-            shouldCloseOnOverlayClick={true}
-            role={"dialog"}
-            style={{
-              overlay: {
-                backgroundColor: "rgba(0, 0, 0, 0.5)",
-                zIndex: 1000,
-              },
-              content: {
-                position: "absolute",
-                top: "40px",
-                left: "40px",
-                right: "40px",
-                bottom: "40px",
-                border: "1px solid #ccc",
-                background: "#fff",
-                overflow: "auto",
-                WebkitOverflowScrolling: "touch",
-                borderRadius: "4px",
-                outline: "none",
-                padding: "20px",
-                height: "200px",
-                width: "380px",
-                margin: "auto",
-              },
-            }}
-            autoFocus={true}
-            handleModalClose={handleModalClose}
-            isOpen={modalOpen}
-            onAfterClose={handleModalClose}
-            onRequestClose={handleModalClose}
-            contentLabel="Edge Weight Modal"
-          >
-            <h2>Enter the edge weight</h2>
-            <br />
-            <form onSubmit={handleModalClose}>
-              <input
-                value={edgeWeight}
-                type="number"
-                placeholder="Edge Weight"
-                autoFocus={true}
-                onChange={(input) => handleWeightChange(input)}
-              />
-              <button type="submit">Submit</button>
-            </form>
-          </Modal>
+            );
+          })}
         </div>
-        <GraphInfo
-          nodes={nodes}
-          edges={edges}
-          adjacencyList={adjacencyList}
-          adjacencyMatrix={adjacencyMatrix}
-        />
+
+        <label
+          htmlFor="rate-range"
+          style={{
+            marginLeft: "auto",
+            marginRight: "auto",
+            textAlign: "center",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: "0.5rem",
+            backgroundColor: "rgba(255, 255, 255, 0.5)",
+            padding: "0.5rem",
+            zIndex: 15,
+          }}
+        >
+          <input
+            id="rate-range"
+            type="range"
+            min="0.1"
+            max="2"
+            value={intervalRate}
+            onChange={(e) => setIntervalRate(parseFloat(e.target.value))}
+            step="0.1"
+          />
+          <h5>Animation Speed: {intervalRate}x</h5>
+        </label>
+
+        <Modal
+          ariaHideApp={false}
+          shouldCloseOnEsc={true}
+          shouldCloseOnOverlayClick={true}
+          role={"dialog"}
+          style={{
+            overlay: {
+              backgroundColor: "rgba(0, 0, 0, 0.5)",
+              zIndex: 1000,
+            },
+            content: {
+              position: "absolute",
+              top: "40px",
+              left: "40px",
+              right: "40px",
+              bottom: "40px",
+              border: "1px solid #ccc",
+              background: "#fff",
+              overflow: "auto",
+              WebkitOverflowScrolling: "touch",
+              borderRadius: "4px",
+              outline: "none",
+              padding: "20px",
+              height: "200px",
+              width: "380px",
+              margin: "auto",
+            },
+          }}
+          autoFocus={true}
+          handleModalClose={handleModalClose}
+          isOpen={modalOpen}
+          onAfterClose={handleModalClose}
+          onRequestClose={handleModalClose}
+          contentLabel="Edge Weight Modal"
+        >
+          <h2>Enter the edge weight</h2>
+          <br/>
+          <form onSubmit={handleModalClose}>
+            <input
+              value={edgeWeight}
+              type="number"
+              placeholder="Edge Weight"
+              autoFocus={true}
+              onChange={(input) => handleWeightChange(input)}
+            />
+            <button type="submit">Submit</button>
+          </form>
+        </Modal>
       </div>
-    </>
+      <GraphInfo
+        showInfo={showInfo}
+        nodes={nodes}
+        edges={edges}
+        adjacencyList={adjacencyList}
+        adjacencyMatrix={adjacencyMatrix}
+      />
+
+    </div>
   );
 };
 

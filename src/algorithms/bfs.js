@@ -1,9 +1,14 @@
 // src/algorithms/bfs.js
 export default function bfs(graph, root) {
-  const states = [];
+  const V = graph.length
+
+  const states = [{
+    nodes: Array(V).fill({visited: false}),
+    edges: []
+  }];
 
   const visited = new Set();
-  const queue = [{ from: undefined, to: root}];
+  const queue = [{from: undefined, to: root}];
   visited.add(root);
 
   while (queue.length > 0) {
@@ -12,10 +17,10 @@ export default function bfs(graph, root) {
 
     console.log("vertex", vertex, "queue", queue, "visited", visited)
 
-    const lastState = states.slice(-1)[0] ?? { nodes: [], edges: [] };
+    const lastState = states.slice(-1)[0]
     const newState = {
-      nodes: [...lastState.nodes, vertex],
-      edges: lastNode === undefined ? [] : [...lastState.edges, { start: lastNode, end: vertex }]
+      nodes: [...lastState.nodes.slice(0, vertex), {visited: true}, ...lastState.nodes.slice(vertex + 1)],
+      edges: lastNode === undefined ? [] : [...lastState.edges, {start: lastNode, end: vertex}]
     }
     states.push(newState);
 
@@ -26,7 +31,7 @@ export default function bfs(graph, root) {
     for (const neighbour of neighbours) {
       if (!visited.has(neighbour)) {
         visited.add(neighbour);
-        queue.push({ from: vertex, to: neighbour});
+        queue.push({from: vertex, to: neighbour});
       }
     }
   }

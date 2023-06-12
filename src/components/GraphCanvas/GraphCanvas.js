@@ -439,18 +439,18 @@ const GraphCanvas = () => {
           {/*  {mousePosition ? "(" + mousePosition.x + ", " + mousePosition.y + ")" : "-"}*/}
           {/*</span>*/}
 
-          <span
-            style={{
-              position: "absolute",
-              left: 0,
-              right: 0,
-              marginLeft: "auto",
-              marginRight: "auto",
-              textAlign: "center",
-            }}
-          >
-              algorithm index: {currentAlgorithmStateIndex}
-            </span>
+          {/*<span*/}
+          {/*  style={{*/}
+          {/*    position: "absolute",*/}
+          {/*    left: 0,*/}
+          {/*    right: 0,*/}
+          {/*    marginLeft: "auto",*/}
+          {/*    marginRight: "auto",*/}
+          {/*    textAlign: "center",*/}
+          {/*  }}*/}
+          {/*>*/}
+          {/*    algorithm index: {currentAlgorithmStateIndex}*/}
+          {/*  </span>*/}
 
           {startIndex != null && mousePosition && (
             <svg
@@ -495,9 +495,7 @@ const GraphCanvas = () => {
                       y2={nodes[edge.end].y + 15}
                       strokeWidth="4"
                       stroke={
-                        algorithmStates?.[
-                          currentAlgorithmStateIndex
-                          ]?.edges?.some(
+                        algorithmStates?.[currentAlgorithmStateIndex]?.edges?.some(
                           (e) =>
                             (e.start === edge.start && e.end === edge.end) ||
                             (e.start === edge.end && e.end === edge.start)
@@ -544,47 +542,63 @@ const GraphCanvas = () => {
             }
           })}
 
-          {nodes.map((node, index) => (
-            <div
-              key={index}
-              style={{
-                position: "absolute",
-                left: node.x,
-                top: node.y, // cursor: "pointer",
-                width: 40,
-                height: 40,
-                borderRadius: "50%",
-                color: "white",
-                textAlign: "center",
-                lineHeight: selectedNodeIndex === index ? "35px" : "40px",
-                fontSize: 20,
-                userSelect: "none",
-                backgroundColor: algorithmStates?.[
-                  currentAlgorithmStateIndex
-                  ]?.nodes?.includes(index)
-                  ? "green"
-                  : "black",
-                border:
-                  index === selectedNodeIndex ? "2.5px solid white" : "none",
-              }}
-              onContextMenu={(e) => {
-                e.preventDefault();
-                removeNode(index);
-              }}
-              onMouseDown={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                startDrawingEdge(index);
-              }}
-              onMouseUp={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                finishDrawingEdge(index);
-              }}
-            >
-              {index + 1}
-            </div>
-          ))}
+          {nodes.map((node, index) => {
+            const algorithmStateNode = algorithmStates?.[currentAlgorithmStateIndex]?.nodes?.[index]
+            return (
+              <div key={index}>
+                {
+                  algorithmStateNode && algorithmStateNode.label && (
+                    <div style={{
+                      position: "absolute",
+                      left: node.x,
+                      top: node.y > 40 ? (node.y - 30) : (node.y + 45),
+                      textAlign: "center",
+                      width: 40,
+                      backgroundColor: "rgba(0,120,0,0.8)",
+                      color: "white",
+                      borderRadius: 6,
+                    }}>
+                      {algorithmStateNode.label}
+                    </div>
+                  )
+                }
+                <div
+                  style={{
+                    position: "absolute",
+                    left: node.x,
+                    top: node.y, // cursor: "pointer",
+                    width: 40,
+                    height: 40,
+                    borderRadius: "50%",
+                    color: "white",
+                    textAlign: "center",
+                    lineHeight: selectedNodeIndex === index ? "35px" : "40px",
+                    fontSize: 20,
+                    userSelect: "none",
+                    backgroundColor: algorithmStateNode?.visited ? "green" : "black",
+                    border:
+                      index === selectedNodeIndex ? "2.5px solid white" : "none",
+                  }}
+                  onContextMenu={(e) => {
+                    e.preventDefault();
+                    removeNode(index);
+                  }}
+                  onMouseDown={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    startDrawingEdge(index);
+                  }}
+                  onMouseUp={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    finishDrawingEdge(index);
+                  }}
+                >
+                  {index + 1}
+                </div>
+              </div>
+            );
+          })}
         </div>
 
         <label

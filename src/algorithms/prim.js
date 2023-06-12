@@ -1,5 +1,5 @@
 export default function prim(adjMatrix) {
-  const states = [];
+  const states = [{nodes: [], edges: []}];
 
   const V = adjMatrix.length;
   // create an array to track selected vertex
@@ -36,7 +36,7 @@ export default function prim(adjMatrix) {
       }
     }
     console.log(`${x}-${y}: ${adjMatrix[x][y]}`);
-    const lastState = states.slice(-1)[0] ?? { nodes: [], edges: [] };
+    const lastState = states.slice(-1)[0]
     const newState = {
       nodes: [],
       edges: [...lastState.edges, { start: x, end: y }]

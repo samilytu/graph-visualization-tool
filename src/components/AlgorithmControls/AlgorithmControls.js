@@ -18,60 +18,85 @@ const AlgorithmControls = ({
                              onDijkstraStatesChange,
                              onClearAlgorithm
                            }) => {
-  // get adjacencyList and setDFSState from props
-  const handleDfs = () => {
-    if (selectedNodeIndex === null) {
-      alert("Please select a node first!");
-      return;
+
+  const requireNodeExists = () => {
+    if (adjacencyList.length === 0) {
+      throw new Error("Please create a node first!");
     }
+  }
 
-    const dfsStates = dfs(adjacencyList, selectedNodeIndex);
-    console.log("dfsStates", dfsStates);
+  const requireNodeSelected = () => {
+    if (selectedNodeIndex === null) {
+      throw new Error("Please select a node first!");
+    }
+  }
 
-    onDfsStatesChange(dfsStates);
+  const handleDfs = () => {
+    try {
+      requireNodeExists();
+      requireNodeSelected();
+
+      const dfsStates = dfs(adjacencyList, selectedNodeIndex);
+      console.log("dfsStates", dfsStates);
+
+      onDfsStatesChange(dfsStates);
+    } catch (e) {
+      alert(e.message);
+    }
   };
 
   const handleBfs = () => {
-    if (selectedNodeIndex === null) {
-      alert("Please select a node first!");
-      return;
+    try {
+      requireNodeExists();
+      requireNodeSelected();
+
+      const bfsStates = bfs(adjacencyList, selectedNodeIndex);
+      console.log("bfsStates", bfsStates);
+
+      onBfsStatesChange(bfsStates);
+    } catch (e) {
+      alert(e.message);
     }
-
-    const bfsStates = bfs(adjacencyList, selectedNodeIndex);
-    console.log("bfsStates", bfsStates);
-
-    onBfsStatesChange(bfsStates);
   };
 
   const handleKruskal = () => {
-    const kruskalStates = kruskal(adjacencyMatrix);
-    console.log("kruskalStates", kruskalStates);
+    try {
+      requireNodeExists()
 
-    onKruskalStatesChange(kruskalStates);
+      const kruskalStates = kruskal(adjacencyMatrix);
+      console.log("kruskalStates", kruskalStates);
+
+      onKruskalStatesChange(kruskalStates);
+    } catch (e) {
+      alert(e.message);
+    }
   }
 
   const handlePrim = () => {
-    // if (selectedNodeIndex === null) {
-    //   alert("Please select a node first!");
-    //   return;
-    // }
+    try {
+      requireNodeExists();
 
-    const primStates = prim(adjacencyMatrix);
-    console.log("primStates", primStates);
+      const primStates = prim(adjacencyMatrix);
+      console.log("primStates", primStates);
 
-    onPrimStatesChange(primStates);
+      onPrimStatesChange(primStates);
+    } catch (e) {
+      alert(e.message);
+    }
   }
 
   const handleDijkstra = () => {
-    if (selectedNodeIndex === null) {
-      alert("Please select a node first!");
-      return;
+    try {
+      requireNodeExists();
+      requireNodeSelected();
+
+      const dijkstraStates = dijkstra(adjacencyMatrix, selectedNodeIndex);
+      console.log("dijkstraStates", dijkstraStates);
+
+      onDijkstraStatesChange(dijkstraStates);
+    } catch (e) {
+      alert(e.message);
     }
-
-    const dijkstraStates = dijkstra(adjacencyMatrix, selectedNodeIndex);
-    console.log("dijkstraStates", dijkstraStates);
-
-    onDijkstraStatesChange(dijkstraStates);
   }
 
   return (

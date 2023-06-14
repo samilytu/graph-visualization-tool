@@ -286,16 +286,11 @@ const GraphCanvas = () => {
   };
 
   const handleMouseUp = (e) => {
-    e.preventDefault();
-
     if (startIndex != null) {
       setEndIndex(null);
       setStartIndex(null);
       return;
     }
-
-    // console.log("handleMouseDown called");
-    if (e.button !== 0) return;
 
     const x = mousePosition.x;
     const y = mousePosition.y;
@@ -322,9 +317,23 @@ const GraphCanvas = () => {
         const y1 = start.y;
         const x2 = end.x;
         const y2 = end.y;
-        const distance =
-          Math.abs((y2 - y1) * x - (x2 - x1) * y + x2 * y1 - y2 * x1) /
-          Math.sqrt(Math.pow(y2 - y1, 2) + Math.pow(x2 - x1, 2));
+
+        // Calculate the squared length of the edge
+        const lengthSquared = Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2);
+
+        // Calculate the dot product of the vector from (x1, y1) to (x, y) with the vector from (x1, y1) to (x2, y2)
+        const dotProduct = ((x - x1) * (x2 - x1)) + ((y - y1) * (y2 - y1));
+
+        // Calculate the normalized parameter value of the closest point on the line segment
+        const t = Math.max(0, Math.min(1, dotProduct / lengthSquared));
+
+        // Calculate the coordinates of the closest point on the line segment
+        const closestX = x1 + (t * (x2 - x1));
+        const closestY = y1 + (t * (y2 - y1));
+
+        // Calculate the distance between the given point and the closest point on the line segment
+        const distance = Math.sqrt(Math.pow(closestX - x, 2) + Math.pow(closestY - y, 2));
+
         return distance < 35;
       })
     );
@@ -351,6 +360,10 @@ const GraphCanvas = () => {
   function clearAlgorithm() {
     setAlgorithm(null)
     setAlgorithmStates(null);
+  }
+
+  function restartAnimation() {
+    setAlgorithmStates(s => [...s])
   }
 
   return (
@@ -451,7 +464,14 @@ const GraphCanvas = () => {
         <div
           ref={canvasRef}
           className="graph-canvas"
-          onMouseUp={handleMouseUp}
+          onMouseUp={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+
+            if (e.button !== 0) return; // Only handle left click
+
+            handleMouseUp(e);
+          }}
           onMouseMove={(e) => {
             setMousePosition({
               x: e.clientX - canvasRef.current.getBoundingClientRect().left - 20,
@@ -486,6 +506,8 @@ const GraphCanvas = () => {
               borderRadius: "1rem",
               zIndex: 10,
               width: "fit-content",
+              userSelect: "none",
+              cursor: "initial",
             }}
           >
             {algorithm}: {currentAlgorithmStateIndex + 1}/{algorithmStates.length}
@@ -554,10 +576,10 @@ const GraphCanvas = () => {
                     }}
                   >
                     <line
-                      x1={nodes[edge.start].x + 15}
-                      y1={nodes[edge.start].y + 15}
-                      x2={nodes[edge.end].x + 15}
-                      y2={nodes[edge.end].y + 15}
+                      x1={nodes[edge.start].x + 20}
+                      y1={nodes[edge.start].y + 20}
+                      x2={nodes[edge.end].x + 20}
+                      y2={nodes[edge.end].y + 20}
                       strokeWidth="4"
                       stroke={
                         algorithmStates?.[currentAlgorithmStateIndex]?.edges?.some(
@@ -577,9 +599,9 @@ const GraphCanvas = () => {
                         position: "absolute",
                         cursor: "pointer",
                         left:
-                          (nodes[edge.start].x + nodes[edge.end].x) / 2 + 10,
+                          (nodes[edge.start].x + nodes[edge.end].x) / 2 + 20,
                         top:
-                          (nodes[edge.start].y + nodes[edge.end].y) / 2 + 10,
+                          (nodes[edge.start].y + nodes[edge.end].y) / 2 + 20,
                         transform: "translate(-50%, -50%)",
                         background: "rgba(201, 178, 227)",
                         padding: "3px 6px",
@@ -623,6 +645,7 @@ const GraphCanvas = () => {
                       color: "white",
                       borderRadius: 6,
                       zIndex: 30,
+                      userSelect: "none",
                     }}>
                       {isFinite(algorithmStateNode.label) ? algorithmStateNode.label.toString() : "∞"}
                     </div>
@@ -630,6 +653,8 @@ const GraphCanvas = () => {
                 }
                 <div
                   style={{
+                    boxShadow: draggingNodeIndex === index ? "rgba(255, 255, 255, 0.8) 0px 0px 9px 3px" : "none",
+                    transition: "box-shadow 0.2s ease-in-out",
                     position: "absolute",
                     left: node.x,
                     top: node.y, // cursor: "pointer",
@@ -647,11 +672,15 @@ const GraphCanvas = () => {
                   }}
                   onContextMenu={(e) => {
                     e.preventDefault();
+                    e.stopPropagation();
                     removeNode(index);
                   }}
                   onMouseDown={(e) => {
                     e.preventDefault();
                     e.stopPropagation();
+
+                    if (e.button !== 0) return; // Only allow left clicks
+
                     if (e.altKey) {
                       // If alt is pressed, start dragging the node
                       startDraggingNode(index);
@@ -662,6 +691,9 @@ const GraphCanvas = () => {
                   onMouseUp={(e) => {
                     e.preventDefault();
                     e.stopPropagation();
+
+                    if (e.button !== 0) return; // Only allow left clicks
+
                     if (draggingNodeIndex != null) {
                       finishDraggingNode();
                     } else {
@@ -676,33 +708,72 @@ const GraphCanvas = () => {
           })}
         </div>
 
-        <label
-          htmlFor="rate-range"
-          style={{
-            marginLeft: "auto",
-            marginRight: "auto",
-            textAlign: "center",
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            justifyContent: "center",
-            gap: "0.5rem",
-            backgroundColor: "rgba(255, 255, 255, 0.5)",
-            padding: "0.5rem",
-            zIndex: 15,
-          }}
-        >
-          <input
-            id="rate-range"
-            type="range"
-            min="0.1"
-            max="2"
-            value={intervalRate}
-            onChange={(e) => setIntervalRate(parseFloat(e.target.value))}
-            step="0.1"
-          />
-          <h5>Animation Speed: {intervalRate}x</h5>
-        </label>
+        <div style={{
+          height: 80,
+          marginLeft: "auto",
+          marginRight: "auto",
+          position: "relative",
+          zIndex: 15,
+          backgroundColor: "rgba(255, 255, 255, 0.5)",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}>
+          {
+            algorithm ? (
+                <>
+                  {/*spacer*/}
+                  <div style={{
+                    flex: "1 1 0px"
+                  }}></div>
+                  <label
+                    htmlFor="rate-range"
+                    style={{
+                      textAlign: "center",
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      gap: "0.5rem",
+                      flex: "1 1 0px"
+                    }}
+                  >
+                    <input
+                      id="rate-range"
+                      type="range"
+                      min="0.1"
+                      max="2"
+                      value={intervalRate}
+                      onChange={(e) => setIntervalRate(parseFloat(e.target.value))}
+                      step="0.1"
+                    />
+                    <h5>Animation Speed: {intervalRate}x</h5>
+                  </label>
+                  <div style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    flex: "1 1 0px"
+                  }}>
+                    <button
+                      onClick={restartAnimation}
+                      disabled={currentAlgorithmStateIndex < algorithmStates.length - 1}
+                    >
+                    <span style={{
+                      display: "inline-block",
+                      transform: "rotate(45deg)",
+                      marginRight: "0.5rem",
+                    }}>&#8635;</span>
+                      Restart
+                    </button>
+                  </div>
+                </>
+              )
+              : (
+                <h5 style={{margin: 0}}>No algorithm is running</h5>
+              )
+          }
+        </div>
 
         <Modal
           ariaHideApp={false}

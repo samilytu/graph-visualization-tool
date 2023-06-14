@@ -19,6 +19,12 @@ button {
   background-color: var(--violet) !important;
   color: white !important;
   text-align: initial !important;
+  user-select: none !important;
+}
+
+button:disabled, button:disabled:hover {
+  background-color: rgba(121, 84, 161, 0.4) !important;
+  cursor: initial !important;
 }
 
 button.danger-button {

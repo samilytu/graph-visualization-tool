@@ -37,7 +37,6 @@
   margin-top: 24px;
   display: flex;
   flex-direction: row;
-  gap: 32px;
 }
 
 .graph-container {
@@ -66,6 +65,17 @@
   height: 100%;
   max-height: 790px;
   padding: 16px;
+  margin-left: 32px;
+  transition: width 400ms ease, opacity 400ms 200ms ease, padding 400ms ease, margin-left 400ms ease;
+}
+
+.graph-info.hidden {
+  overflow: hidden;
+  opacity: 0;
+  width: 0;
+  padding: 0;
+  margin-left: 0;
+  transition: width 400ms ease, opacity 100ms ease, padding 400ms ease, margin-left 400ms ease;
 }
 
 table, th, td {
